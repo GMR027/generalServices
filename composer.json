@@ -1,0 +1,14 @@
+{
+    "name": "gestionproyectos/mvc",
+    "description": "Proyecto MVC de gestion de proyectos",
+    "autoload": {
+        "psr-4": {
+            "MVC\\": "",
+            "Controllers\\": "controllers/",
+            "Model\\": "models/"
+        }
+    },
+    "require": {
+        "intervention/image": "^3.11"
+    }
+}

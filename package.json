@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "dev": "npx gulp css && npx gulp js",
+    "build": "npx gulp css && npx gulp js"
+  },
+  "dependencies": {
+    "gulp": "^5.0.1"
+  },
+  "devDependencies": {
+    "gulp-sass": "^6.0.1",
+    "sass": "^1.97.3"
+  }
+}

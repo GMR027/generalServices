@@ -1,0 +1,129 @@
+/* custom overrides after dropping SCSS
+   keep minimal rules required previously */
+
+nav .nav-wrapper.container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-height: 64px;
+  margin: 0;
+  padding: 0 1rem;
+  overflow-x: auto;
+}
+
+nav .nav-wrapper .right li a,
+nav .nav-wrapper .brand-logo,
+nav .nav-wrapper .sidenav-trigger {
+  line-height: 64px;
+  height: 64px;
+}
+
+/* container sizing */
+.container {
+  max-width: 95% !important;
+  margin: 2rem auto;
+}
+
+@media (max-width: 1200px) {
+  .container { max-width: 85% !important; }
+}
+@media (max-width: 768px) {
+  .container { max-width: 95% !important; }
+}
+
+/* detalle report width */
+.reporte-detalle.container {
+  max-width: 98% !important;
+}
+
+/* gallery layout for report images */
+.galeria {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* adjust gallery columns on narrow screens */
+@media (max-width: 768px) {
+  .galeria {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* modal for enlarged image */
+.img-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
+
+/* navigation layout fixes */
+nav .nav-wrapper.container {
+  justify-content: space-between;
+}
+nav .brand-logo {
+  flex: 0 0 auto;
+  margin-right: 1rem;
+  font-size: 1.5rem;
+}
+
+/* extra space between logo and menu button on mobile */
+nav .sidenav-trigger {
+  margin-left: 1rem;
+}
+
+/* footer adjustments */
+.page-footer .brand-logo {
+  font-size: 1.75rem;
+}
+
+/* flash message fallback style (if ever used) */
+.alerta {
+  padding: .75rem 1rem;
+  border-radius: .25rem;
+  margin-bottom: 1rem;
+}
+.alerta.exito { background: #dff0d8; color: #3c763d; }
+.alerta.error { background: #f2dede; color: #a94442; }
+
+/* make report title smaller (also helps in PDF export) */
+.reporte-detalle h2,
+.reporte-detalle h3 {
+  font-size: 1.5rem;
+}
+
+.img-modal .img-wrapper {
+  position: relative;
+}
+
+.img-modal .modal-content {
+  max-width: 95%;
+  max-height: 95%;
+  display: block;
+}
+
+.img-modal .modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.galeria img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  object-fit: cover;
+}
