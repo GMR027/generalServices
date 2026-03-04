@@ -11,53 +11,86 @@
     <link rel="stylesheet" href="/css/custom.css">
 </head>
 <body>
+    <?php
+        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+        function isActive($path, $current) {
+            // return true if $current starts with $path
+            return strpos($current, $path) === 0;
+        }
+    ?>
     <header>
-        <nav class="blue-grey darken-4 z-depth-1" role="navigation">
+        <nav class="blue-grey darken-4 z-depth-1 primary" role="navigation">
             <div class="nav-wrapper container">
                 <a href="/" class="brand-logo">GS</a>
-                <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <ul id="nav-mobile" class="right hide-on-med-and-down">
-                    <li><a href="/">Inicio</a></li>
+                <ul class="right hide-on-med-and-down" style="margin-left:auto;">
+                    <li class="<?php echo isActive('/', $currentPath) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
                     <?php if(usuarioActual()): ?>
-                        <?php if(rolActual() === 'admin'): ?>
-                            <li><a href="/admin">Home Admin</a></li>
-                            <li><a href="/disciplinas">Disciplinas</a></li>
-                            <li><a href="/subdisciplinas">Subdisciplinas</a></li>
-                            <li><a href="/clientes">Clientes</a></li>
-                            <li><a href="/empresas">Empresas</a></li>
-                            <li><a href="/proyectos">Proyectos</a></li>
-                            <li><a href="/permisos">Permisos</a></li>
-                        <?php endif; ?>
-                        <?php if(rolActual() === 'cliente'): ?>
-                            <li><a href="/mis-proyectos">Mis proyectos</a></li>
-                            <li><a href="/reportes/crear">Registro</a></li>
-                            <li><a href="/reportes">Ver reportes</a></li>
-                        <?php endif; ?>
-                        <li><a href="#" class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
+                        <li><a class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
                         <li><a href="/logout" class="red">Cerrar sesión</a></li>
                     <?php endif; ?>
                 </ul>
+                <a href="#" data-target="mobile-main" class="sidenav-trigger"><i class="material-icons">menu</i></a>
             </div>
         </nav>
-        <ul class="sidenav" id="mobile-demo">
-            <li><a href="/">Inicio</a></li>
+        <nav class="blue-grey lighten-1 secondary" role="navigation">
+            <div class="nav-wrapper container">
+                <ul class="right hide-on-med-and-down">
+                    <?php if(usuarioActual()): ?>
+                        <?php if(rolActual() === 'admin'): ?>
+                            <li class="<?php echo isActive('/admin', $currentPath) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
+                            <li class="<?php echo isActive('/disciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
+                            <li class="<?php echo isActive('/subdisciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
+                            <li class="<?php echo isActive('/clientes', $currentPath) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
+                            <li class="<?php echo isActive('/empresas', $currentPath) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
+                            <li class="<?php echo isActive('/proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
+                            <li class="<?php echo isActive('/permisos', $currentPath) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
+                            <li class="<?php echo isActive('/categorias', $currentPath) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
+                            <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                            <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                            <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
+                        <?php endif; ?>
+                        <?php if(rolActual() === 'cliente'): ?>
+                            <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
+                            <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
+                            <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
+                            <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                            <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                            <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </ul>
+                <a href="#" data-target="mobile-secondary" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            </div>
+        </nav>
+        <ul class="sidenav" id="mobile-main">
+            <li class="<?php echo isActive('/', $currentPath) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
+            <?php if(usuarioActual()): ?>
+                <li><a class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
+                <li><a href="/logout" class="red">Cerrar sesión</a></li>
+            <?php endif; ?>
+        </ul>
+        <ul class="sidenav" id="mobile-secondary">
             <?php if(usuarioActual()): ?>
                 <?php if(rolActual() === 'admin'): ?>
-                    <li><a href="/admin">Home Admin</a></li>
-                    <li><a href="/disciplinas">Disciplinas</a></li>
-                    <li><a href="/subdisciplinas">Subdisciplinas</a></li>
-                    <li><a href="/clientes">Clientes</a></li>
-                    <li><a href="/empresas">Empresas</a></li>
-                    <li><a href="/proyectos">Proyectos</a></li>
-                    <li><a href="/permisos">Permisos</a></li>
+                    <li class="<?php echo isActive('/admin', $currentPath) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
+                    <li class="<?php echo isActive('/disciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
+                    <li class="<?php echo isActive('/subdisciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
+                    <li class="<?php echo isActive('/clientes', $currentPath) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
+                    <li class="<?php echo isActive('/empresas', $currentPath) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
+                    <li class="<?php echo isActive('/proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
+                    <li class="<?php echo isActive('/permisos', $currentPath) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
+                    <li class="<?php echo isActive('/categorias', $currentPath) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
+                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                    <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
                 <?php endif; ?>
                 <?php if(rolActual() === 'cliente'): ?>
-                    <li><a href="/mis-proyectos">Mis proyectos</a></li>
-                    <li><a href="/reportes/crear">Registro</a></li>
-                    <li><a href="/reportes">Ver reportes</a></li>
+                    <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
+                    <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
+                    <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
+                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                    <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                    <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
                 <?php endif; ?>
-                <li><a href="#" class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
-                <li><a href="/logout" class="red">Cerrar sesión</a></li>
             <?php endif; ?>
         </ul>
     </header>

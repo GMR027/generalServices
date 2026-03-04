@@ -6,9 +6,16 @@ nav .nav-wrapper.container {
   align-items: center;
   flex-wrap: wrap;
   min-height: 64px;
-  margin: 0;
+  margin: 0 auto; /* center horizontally */
+  max-width: 1200px; /* limit width if needed */
   padding: 0 1rem;
   overflow-x: auto;
+}
+
+/* primary navbar: do not wrap to keep logo and links in one line */
+nav.primary .nav-wrapper.container {
+  flex-wrap: nowrap;
+  justify-content: flex-start; /* keep logo at left, items at right via margin-left:auto */
 }
 
 nav .nav-wrapper .right li a,
@@ -44,6 +51,38 @@ nav .nav-wrapper .sidenav-trigger {
   margin-top: 1rem;
 }
 
+/* global heading spacing */
+h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* activity column in program de obra should take half the table width */
+th.col-actividad, td.col-actividad {
+  width: 50%;
+}
+
+/* standard form spacing */
+.formulario .input-field {
+  margin-bottom: 1.25rem;
+}
+
+/* action buttons alignment */
+.right-align .btn {
+  margin-left: 0.5rem;
+}
+
+/* improve table padding */
+.tabla-datos th,
+.tabla-datos td {
+  padding: 0.5rem 0.75rem;
+}
+
+/* highlight active nav link */
+nav ul li.active > a {
+  background: rgba(255,255,255,0.1);
+}
+
 /* adjust gallery columns on narrow screens */
 @media (max-width: 768px) {
   .galeria {
@@ -68,9 +107,17 @@ nav .nav-wrapper .sidenav-trigger {
 nav .nav-wrapper.container {
   justify-content: space-between;
 }
+nav.primary .nav-wrapper.container {
+  justify-content: space-between;
+  flex-wrap: nowrap; /* prevent logo/link wrapping */
+}
+nav.secondary .nav-wrapper.container {
+  justify-content: center;
+}
+
 nav .brand-logo {
   flex: 0 0 auto;
-  margin-right: 1rem;
+  margin-right: 2rem; /* extra separation */
   font-size: 1.5rem;
 }
 
@@ -92,6 +139,37 @@ nav .sidenav-trigger {
 }
 .alerta.exito { background: #dff0d8; color: #3c763d; }
 .alerta.error { background: #f2dede; color: #a94442; }
+
+/* ensure text remains readable when using lighten backgrounds */
+.green.lighten-4,
+.yellow.lighten-4,
+.red.lighten-4 {
+  color: #000 !important;
+}
+
+/* gantt graphic bar for obra activities */
+.gantt-bar {
+  border-radius: 2px;
+  /* day markers: every 10px (1 day), darker line every 30px (~month) */
+  background: repeating-linear-gradient(
+      90deg,
+      #2196F3,
+      #2196F3 9px,
+      #1976D2 9px,
+      #1976D2 10px,
+      #2196F3 30px,
+      #2196F3 29px,
+      #1976D2 29px,
+      #1976D2 30px
+  );
+}
+
+/* make tables slightly smaller when printing/pdf export */
+.reporte-detalle .tabla-datos {
+  font-size: 0.85rem;
+}
+
+
 
 /* make report title smaller (also helps in PDF export) */
 .reporte-detalle h2,

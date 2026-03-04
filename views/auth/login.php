@@ -6,15 +6,19 @@
     </div>
 <?php endforeach; ?>
 
-<form method="POST" class="formulario">
+<form method="POST" class="formulario" style="max-width:400px; margin:auto;">
     <fieldset>
         <legend>Datos de acceso</legend>
 
-        <label for="correo">Correo:</label>
-        <input type="email" name="login[correo]" id="correo" placeholder="Tu correo" required>
+        <div class="input-field">
+            <input type="email" name="login[correo]" id="correo" class="validate" required>
+            <label for="correo">Correo</label>
+        </div>
 
-        <label for="contrasena">Contraseña:</label>
-        <input type="password" name="login[contrasena]" id="contrasena" placeholder="Tu contraseña" required>
+        <div class="input-field">
+            <input type="password" name="login[contrasena]" id="contrasena" class="validate" required>
+            <label for="contrasena">Contraseña</label>
+        </div>
     </fieldset>
 
     <button type="submit" class="btn green"><i class="material-icons left">login</i>Entrar</button>

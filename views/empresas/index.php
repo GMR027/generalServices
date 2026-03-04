@@ -1,6 +1,10 @@
-<h2 class="header center-align">Empresas</h2>
-<div class="right-align" style="margin-bottom:1rem;">
-    <a href="/empresas/crear" class="btn green"><i class="material-icons left">add</i>Nueva empresa</a>
+<div class="row valign-wrapper" style="margin-bottom:1rem;">
+    <div class="col s12 m6">
+        <h2 class="left">Empresas</h2>
+    </div>
+    <div class="col s12 m6 right-align">
+        <a href="/empresas/crear" class="btn green btn-small"><i class="material-icons left">add</i>Nueva empresa</a>
+    </div>
 </div>
 
 <table class="striped highlight responsive-table">

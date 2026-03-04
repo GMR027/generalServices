@@ -29,6 +29,7 @@ class Router {
       '/empresas',
       '/permisos', '/permisos/crear', '/permisos/actualizar', '/permisos/eliminar',
       // '/reportes*' no se protege aquí para permitir acceso de clientes; control interno se encarga
+      // '/bitacora*' igual que reportes: dejamos la lógica de permisos a los propios controladores
     ];
 
     // obtener sólo la ruta, sin query string

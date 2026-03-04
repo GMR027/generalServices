@@ -12,6 +12,14 @@ $router = new Router();
 // Rutas públicas
 $router->get('/', [PaginasController::class, 'index']);
 $router->post('/', [PaginasController::class, 'index']);
+// Programa de obra actividades
+use Controllers\ActividadObraController;
+$router->get('/p-obra', [ActividadObraController::class, 'index']);
+$router->get('/p-obra/crear', [ActividadObraController::class, 'crear']);
+$router->post('/p-obra/crear', [ActividadObraController::class, 'crear']);
+$router->get('/p-obra/editar', [ActividadObraController::class, 'editar']);
+$router->post('/p-obra/editar', [ActividadObraController::class, 'editar']);
+$router->post('/p-obra/eliminar', [ActividadObraController::class, 'eliminar']);
 
 // Autenticación
 use Controllers\AuthController;
@@ -91,6 +99,37 @@ $router->get('/reportes/editar', [ReporteController::class, 'editar']);
 $router->post('/reportes/editar', [ReporteController::class, 'editar']);
 $router->get('/reportes/detalle', [ReporteController::class, 'detalle']);
 $router->post('/reportes/eliminar', [ReporteController::class, 'eliminar']);
+
+// CRUD categorías (administrador)
+use Controllers\CategoriaController;
+$router->get('/categorias', [CategoriaController::class, 'index']);
+$router->get('/categorias/crear', [CategoriaController::class, 'crear']);
+$router->post('/categorias/crear', [CategoriaController::class, 'crear']);
+$router->get('/categorias/actualizar', [CategoriaController::class, 'actualizar']);
+$router->post('/categorias/actualizar', [CategoriaController::class, 'actualizar']);
+$router->post('/categorias/eliminar', [CategoriaController::class, 'eliminar']);
+
+// CRUD bitácora
+use Controllers\BitacoraController;
+$router->get('/bitacora', [BitacoraController::class, 'index']);
+$router->get('/bitacora/crear', [BitacoraController::class, 'crear']);
+$router->post('/bitacora/crear', [BitacoraController::class, 'crear']);
+$router->get('/bitacora/editar', [BitacoraController::class, 'editar']);
+$router->post('/bitacora/editar', [BitacoraController::class, 'editar']);
+$router->post('/bitacora/eliminar', [BitacoraController::class, 'eliminar']);
+// detalle bitácora
+$router->get('/bitacora/detalle', [BitacoraController::class, 'detalle']);
+
+// CRUD minutas (nueva funcionalidad)
+use Controllers\MinutaController;
+$router->get('/minutas', [MinutaController::class, 'index']);
+$router->get('/minutas/crear', [MinutaController::class, 'crear']);
+$router->post('/minutas/crear', [MinutaController::class, 'crear']);
+$router->get('/minutas/actualizar', [MinutaController::class, 'actualizar']);
+$router->post('/minutas/actualizar', [MinutaController::class, 'actualizar']);
+$router->post('/minutas/eliminar', [MinutaController::class, 'eliminar']);
+// detalle de minuta
+$router->get('/minutas/detalle', [MinutaController::class, 'detalle']);
 
 
 // Ejecutar

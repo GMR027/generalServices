@@ -48,10 +48,16 @@
                 <td><?php echo $r->proyecto_nombre ?? '-'; ?></td>
                 <td><?php echo $r->disciplina_nombre ?? '-'; ?></td>
                 <td><?php echo $r->subdisciplina_nombre ?? '-'; ?></td>
-                <td><?php echo $r->actividad; ?></td>
-                <td><?php echo $r->area_zonal; ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->actividad) > 40 ? substr($r->actividad,0,40) . '...' : $r->actividad
+                ); ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->area_zonal) > 40 ? substr($r->area_zonal,0,40) . '...' : $r->area_zonal
+                ); ?></td>
                 <td><?php echo $r->nivel; ?></td>
-                <td><?php echo $r->permisoTrabajo; ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->permisoTrabajo) > 40 ? substr($r->permisoTrabajo,0,40) . '...' : $r->permisoTrabajo
+                ); ?></td>
                 <td><?php echo $r->horastrabajadas; ?></td>
                 <td>
                     <a href="/reportes/editar?id=<?php echo $r->id; ?>" class="btn amber darken-2 btn-small"><i class="material-icons left">edit</i>Editar</a>

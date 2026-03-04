@@ -3,10 +3,16 @@ use Model\Disciplina;
 use Model\Subdisciplina; ?>
 
 
-<h2>Reportes</h2>
-<?php if(isset($canCreate) && $canCreate): ?>
-    <a href="/reportes/crear" class="btn green"><i class="material-icons left">add</i>Nuevo reporte</a>
-<?php endif; ?>
+<div class="row valign-wrapper" style="margin-bottom:1rem;">
+    <div class="col s12 m6">
+        <h2 class="left">Reportes</h2>
+    </div>
+    <?php if(isset($canCreate) && $canCreate): ?>
+    <div class="col s12 m6 right-align">
+        <a href="/reportes/crear" class="btn green btn-small"><i class="material-icons left">add</i>Nuevo reporte</a>
+    </div>
+    <?php endif; ?>
+</div>
 
 <!-- filtro por proyectos -->
 <?php if(!empty($filterProjects)): ?>
@@ -62,10 +68,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><?php echo $r->proyecto_nombre ?? $proj->nombre ?? '-'; ?></td>
                 <td><?php echo $r->disciplina_nombre ?? (Disciplina::find($proj->disciplina_id)->nombre ?? '-'); ?></td>
                 <td><?php echo $r->subdisciplina_nombre ?? (Subdisciplina::find($proj->subdisciplina_id)->nombre ?? '-'); ?></td>
-                <td><?php echo $r->actividad; ?></td>
-                <td><?php echo $r->area_zonal; ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->actividad) > 40 ? substr($r->actividad,0,40) . '...' : $r->actividad
+                ); ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->area_zonal) > 40 ? substr($r->area_zonal,0,40) . '...' : $r->area_zonal
+                ); ?></td>
                 <td><?php echo $r->nivel; ?></td>
-                <td><?php echo $r->permisoTrabajo; ?></td>
+                <td><?php echo htmlspecialchars(
+                    strlen($r->permisoTrabajo) > 40 ? substr($r->permisoTrabajo,0,40) . '...' : $r->permisoTrabajo
+                ); ?></td>
                 <td><?php echo $r->horastrabajadas; ?></td>
                 <td>
                     <?php

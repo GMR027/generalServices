@@ -15,4 +15,6 @@ class PaginasController {
         $router->render('paginas/index');
     }
 
+
+
 }
