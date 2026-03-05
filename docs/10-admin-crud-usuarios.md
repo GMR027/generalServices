@@ -45,7 +45,7 @@ Estos enlaces solo aparecen si `rolActual()` retorna `'admin'`. El resto de usua
 
 ## 10.4. Mensajería y redirección
 
-Después de crear, actualizar o borrar, el usuario es redirigido a `/clientes` con un parámetro `resultado` que en el panel puede mostrar un mensaje (implementable usando `getFlashMessage()` si se desea).
+Después de crear, actualizar o borrar, el usuario es redirigido a `/clientes` con un parámetro `resultado` que en el panel puede mostrar un mensaje (implementable usando `obtenerMensajeFlash()` si se desea).
 
 ## 10.4. Ejecución
 
@@ -54,7 +54,7 @@ Después de crear, actualizar o borrar, el usuario es redirigido a `/clientes` c
 3. Crea un nuevo usuario (escribe contraseña simple; se hasheará automáticamente).
 4. Edita o elimina registros.
 
-> 🔒 Recuerda que sólo un admin debería poder acceder a estas rutas; la protección se realiza en el router y también puedes añadir `isAdmin()` al inicio de los métodos del controlador si deseas doble chequeo.
+> 🔒 Recuerda que sólo un admin debería poder acceder a estas rutas; la protección se realiza en el router y también puedes añadir `esAdmin()` al inicio de los métodos del controlador si deseas doble chequeo.
 
 Con esto, la gestión de usuarios queda lista.
 

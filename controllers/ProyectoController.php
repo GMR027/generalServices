@@ -6,6 +6,7 @@ use MVC\Router;
 use Model\Proyecto;
 use Model\Disciplina;
 use Model\Subdisciplina;
+use Model\Permiso;
 
 class ProyectoController {
     public static function index(Router $router) {
@@ -25,7 +26,7 @@ class ProyectoController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -52,7 +53,7 @@ class ProyectoController {
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -80,7 +81,7 @@ class ProyectoController {
     }
 
     public static function eliminar() {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -88,9 +89,32 @@ class ProyectoController {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
             if($id) {
+                // comprobar relaciones: permisos, minutas, reportes, bitacora etc.
+                $rels = [];
+                $check = Permiso::consultaSQL("SELECT 1 FROM permisos WHERE proyecto_id=" . intval($id) . " LIMIT 1");
+                if(!empty($check)) { $rels[] = 'permisos'; }
+                // minutas
+                $m = Proyecto::consultaSQL("SELECT 1 FROM minutas WHERE proyecto_id=" . intval($id) . " LIMIT 1");
+                if(!empty($m)) { $rels[] = 'minutas'; }
+                // reportes
+                $r = Proyecto::consultaSQL("SELECT 1 FROM reportes WHERE proyecto_id=" . intval($id) . " LIMIT 1");
+                if(!empty($r)) { $rels[] = 'reportes'; }
+                // bitacora
+                $b = Proyecto::consultaSQL("SELECT 1 FROM bitacoras WHERE proyecto_id=" . intval($id) . " LIMIT 1");
+                if(!empty($b)) { $rels[] = 'bitacora'; }
+
+                if(!empty($rels)) {
+                    $lista = implode(', ', $rels);
+                    establecerMensajeFlash('No se puede eliminar proyecto porque existen registros en: ' . $lista, 'error');
+                    header('Location: /proyectos');
+                    return;
+                }
+
                 $proyecto = Proyecto::find($id);
-                $proyecto->eliminar();
-                header('Location: /proyectos?resultado=3');
+                if($proyecto) {
+                    $proyecto->eliminar();
+                    header('Location: /proyectos?resultado=3');
+                }
             }
         }
     }

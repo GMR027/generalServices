@@ -8,7 +8,7 @@ use Intervention\Image\ImageManager; // reuse Intervention for logos
 
 class EmpresaController {
     public static function index(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -19,7 +19,7 @@ class EmpresaController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -69,7 +69,7 @@ class EmpresaController {
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -118,7 +118,7 @@ class EmpresaController {
     }
 
     public static function eliminar() {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }

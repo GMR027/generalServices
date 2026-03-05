@@ -37,11 +37,11 @@
         <label for="categoriaJunta">Categoría de la junta</label>
     </div>
     <div class="input-field">
-        <textarea id="informacionJunta" class="materialize-textarea" name="minuta[informacionJunta]"><?php echo $minuta->informacionJunta ?? ''; ?></textarea>
+        <textarea id="informacionJunta" class="materialize-textarea" name="minuta[informacionJunta]" rows="5"><?php echo $minuta->informacionJunta ?? ''; ?></textarea>
         <label for="informacionJunta">Información de la junta</label>
     </div>
     <div class="input-field">
-        <textarea id="compromisos" class="materialize-textarea" name="minuta[compromisos]"><?php echo $minuta->compromisos ?? ''; ?></textarea>
+        <textarea id="compromisos" class="materialize-textarea" name="minuta[compromisos]" rows="5"><?php echo $minuta->compromisos ?? ''; ?></textarea>
         <label for="compromisos">Compromisos</label>
     </div>
     <button type="submit" class="btn green"><i class="material-icons left">save</i>Guardar minuta</button>

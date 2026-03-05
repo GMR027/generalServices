@@ -4,10 +4,11 @@ namespace Controllers;
 
 use MVC\Router;
 use Model\Usuario;
+use Model\Permiso;
 
 class UsuarioController {
     public static function index(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -18,7 +19,7 @@ class UsuarioController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -42,7 +43,7 @@ class UsuarioController {
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -77,9 +78,19 @@ class UsuarioController {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
             if($id) {
+                // verificar dependencias en permisos
+                $hay = Permiso::consultaSQL("SELECT 1 FROM permisos WHERE cliente_id=" . intval($id) . " LIMIT 1");
+                if(!empty($hay)) {
+                    establecerMensajeFlash('No se puede eliminar usuario con permisos asignados', 'error');
+                    header('Location: /clientes');
+                    return;
+                }
+
                 $usuario = Usuario::find($id);
-                $usuario->eliminar();
-                header('Location: /clientes?resultado=3');
+                if($usuario) {
+                    $usuario->eliminar();
+                    header('Location: /clientes?resultado=3');
+                }
             }
         }
     }

@@ -10,15 +10,15 @@ use Model\Categoria;
 
 class BitacoraController {
     public static function index(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
 
         // proyectos disponibles para filtro
-        if(isAdmin()) {
+        if(esAdmin()) {
             $filterProjects = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $filterProjects = Proyecto::consultaSQL($sql);
         }
 
@@ -27,7 +27,7 @@ class BitacoraController {
             $selected = array_map('intval', (array)$_GET['proyecto_id']);
         }
 
-        if(isAdmin()) {
+        if(esAdmin()) {
             $query = "SELECT b.*, p.nombre AS proyecto_nombre, c.nombre AS categoria_nombre " .
                      "FROM bitacoras b " .
                      "JOIN proyectos p ON b.proyecto_id = p.id " .
@@ -43,7 +43,7 @@ class BitacoraController {
                      "JOIN permisos perm ON b.proyecto_id = perm.proyecto_id " .
                      "JOIN proyectos p ON b.proyecto_id = p.id " .
                      "LEFT JOIN categorias c ON b.categoria_id = c.id " .
-                     "WHERE perm.cliente_id = " . intval($userId);
+                     "WHERE perm.cliente_id = " . intval($idUsuario);
             if(!empty($selected)) {
                 $query .= " AND b.proyecto_id IN (" . join(',', $selected) . ")";
             }
@@ -59,14 +59,14 @@ class BitacoraController {
     }
 
     public static function crear(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
 
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
 
@@ -79,7 +79,7 @@ class BitacoraController {
             $errores = $bitacora->validarErrores();
 
             // comprobar que el proyecto elegido esté en la lista permitida
-            if(!isAdmin()) {
+            if(!esAdmin()) {
                 $allowedIds = array_map(fn($p) => $p->id, $proyectos);
                 if(!in_array($bitacora->proyecto_id, $allowedIds, true)) {
                     $errores[] = 'No tiene permiso para usar el proyecto seleccionado.';
@@ -88,7 +88,7 @@ class BitacoraController {
 
             if(empty($errores)) {
                 $bitacora->guardar();
-                setFlashMessage('Entrada de bitácora creada correctamente');
+                establecerMensajeFlash('Entrada de bitácora creada correctamente');
                 header('Location: /bitacora');
                 return;
             }
@@ -103,8 +103,8 @@ class BitacoraController {
     }
 
     public static function eliminar() {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -119,17 +119,17 @@ class BitacoraController {
                 return;
             }
 
-            if(isAdmin()) {
+            if(esAdmin()) {
                 $bit->eliminar();
-                setFlashMessage('Entrada eliminada');
+                establecerMensajeFlash('Entrada eliminada');
             } else {
-                $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($bit->proyecto_id) . " LIMIT 1";
+                $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($bit->proyecto_id) . " LIMIT 1";
                 $perm = Permiso::consultaSQL($query);
                 if(!empty($perm)) {
                     $bit->eliminar();
-                    setFlashMessage('Entrada eliminada');
+                    establecerMensajeFlash('Entrada eliminada');
                 } else {
-                    setFlashMessage('No tienes permiso para eliminar esta entrada', 'error');
+                    establecerMensajeFlash('No tienes permiso para eliminar esta entrada', 'error');
                 }
             }
             header('Location: /bitacora');
@@ -137,8 +137,8 @@ class BitacoraController {
     }
 
     public static function editar(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? $_POST['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -151,25 +151,25 @@ class BitacoraController {
             return;
         }
 
-        if(!isAdmin()) {
+        if(!esAdmin()) {
             // @var Bitacora $bitacora
             /** @var Bitacora $bitacora */
             $pid = $bitacora->proyecto_id;
-            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($pid) . " LIMIT 1";
+            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($pid) . " LIMIT 1";
             $perm = Permiso::consultaSQL($query);
             if(empty($perm)) {
-                setFlashMessage('No tienes permiso para modificar esta entrada', 'error');
+                establecerMensajeFlash('No tienes permiso para modificar esta entrada', 'error');
                 header('Location: /bitacora');
                 return;
             }
         }
 
         $errores = Bitacora::getErrores();
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
         $categorias = Categoria::all();
@@ -180,7 +180,7 @@ class BitacoraController {
 
             if(empty($errores)) {
                 $bitacora->guardar();
-                setFlashMessage('Entrada actualizada correctamente');
+                establecerMensajeFlash('Entrada actualizada correctamente');
                 header('Location: /bitacora');
                 return;
             }
@@ -195,8 +195,8 @@ class BitacoraController {
     }
 
     public static function detalle(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -210,11 +210,11 @@ class BitacoraController {
         }
 
         // permiso: admin o cliente con cualquier permiso sobre proyecto
-        if(!isAdmin()) {
+        if(!esAdmin()) {
             // @var Bitacora $bitacora
             /** @var Bitacora $bitacora */
             $pid = $bitacora->proyecto_id;
-            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($pid) . " LIMIT 1";
+            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($pid) . " LIMIT 1";
             $perm = Permiso::consultaSQL($query);
             if(empty($perm)) {
                 header('Location: /bitacora');

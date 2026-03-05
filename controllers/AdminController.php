@@ -9,7 +9,7 @@ use Model\Proyecto;
 class AdminController {
     public static function index(Router $router) {
         // mostrar listado de reportes con filtro por proyecto
-        ensureSession();
+        asegurarSesion();
 
         // proyectos para filtro
         $filterProjects = Proyecto::all();

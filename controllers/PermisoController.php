@@ -10,7 +10,7 @@ use Model\Empresa;
 
 class PermisoController {
     public static function index(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -28,7 +28,7 @@ class PermisoController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -62,7 +62,7 @@ class PermisoController {
                     $p->guardar();
                 }
             }
-            setFlashMessage('Permisos asignados correctamente');
+            establecerMensajeFlash('Permisos asignados correctamente');
             header('Location: /permisos');
         }
 
@@ -76,7 +76,7 @@ class PermisoController {
     }
 
     public static function eliminar() {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -86,14 +86,14 @@ class PermisoController {
             if($id) {
                 $perm = Permiso::find($id);
                 $perm->eliminar();
-                setFlashMessage('Permiso eliminado');
+                establecerMensajeFlash('Permiso eliminado');
                 header('Location: /permisos');
             }
         }
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -141,7 +141,7 @@ class PermisoController {
                 $errores = $permiso->validarErrores();
                 if(empty($errores)) {
                     $permiso->guardar();
-                    setFlashMessage('Permiso actualizado');
+                    establecerMensajeFlash('Permiso actualizado');
                     header('Location: /permisos');
                     return;
                 }
@@ -160,7 +160,7 @@ class PermisoController {
                         $p->guardar();
                     }
                 }
-                setFlashMessage('Permisos actualizados');
+                establecerMensajeFlash('Permisos actualizados');
                 header('Location: /permisos');
                 return;
             }
@@ -178,7 +178,7 @@ class PermisoController {
 
     // muestra proyectos asignados al cliente
     public static function misProyectos(Router $router) {
-        ensureSession();
+        asegurarSesion();
         $clienteId = idActual();
         if(!$clienteId) {
             header('Location: /login');

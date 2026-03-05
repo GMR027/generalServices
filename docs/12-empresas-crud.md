@@ -32,7 +32,7 @@ El campo `logo` es opcional; puedes subir imágenes y almacenar la ruta si prefi
 ## 12.2. Modelo y controlador
 
 - `models/Empresa.php` extiende `ActiveRecord` y valida los campos obligatorios.
-- `controllers/EmpresaController.php` implementa el CRUD y comprueba `isAdmin()` al inicio de cada método.
+- `controllers/EmpresaController.php` implementa el CRUD y comprueba `esAdmin()` al inicio de cada método.
 
 Las rutas añadidas en `public/index.php` son:
 

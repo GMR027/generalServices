@@ -53,6 +53,7 @@
                             <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
                             <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
                             <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
+                            <li class="<?php echo isActive('/reportes/galeria', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>
                             <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
                             <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
                             <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
@@ -86,8 +87,7 @@
                 <?php if(rolActual() === 'cliente'): ?>
                     <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
                     <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
-                    <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
-                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                    <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>                    <li class="<?php echo isActive('/reportes/galeria', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
                     <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
                     <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
                 <?php endif; ?>
@@ -98,8 +98,8 @@
         <div class="container">
         <?php
         // mostrar mensaje si existe (puede incluir tipo)
-        if(function_exists('getFlashMessage')) {
-            $flash = getFlashMessage();
+        if(function_exists('obtenerMensajeFlash')) {
+            $flash = obtenerMensajeFlash();
             if($flash) {
                 if(is_array($flash)) {
                     $texto = $flash['texto'];

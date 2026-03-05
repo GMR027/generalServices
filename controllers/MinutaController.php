@@ -9,14 +9,14 @@ use Model\Permiso;
 
 class MinutaController {
     public static function index(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         // proyectos para filtro
-        if(isAdmin()) {
+        if(esAdmin()) {
             $filterProjects = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $filterProjects = Proyecto::consultaSQL($sql);
         }
         $selected = [];
@@ -41,14 +41,14 @@ class MinutaController {
     }
 
     public static function crear(Router $router) {
-        ensureSession();
+        asegurarSesion();
         // obtener lista de proyectos según permisos
-        $userId = idActual();
-        if(isAdmin()) {
+        $idUsuario = idActual();
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
 
@@ -60,7 +60,7 @@ class MinutaController {
             $minuta = new Minuta($_POST['minuta']);
             $errores = $minuta->validarErrores();
             // validar que proyecto esté permitido para no-admins
-            if(!isAdmin()) {
+            if(!esAdmin()) {
                 $allowedIds = array_map(fn($p) => $p->id, $proyectos);
                 if(!in_array($minuta->proyecto_id, $allowedIds, true)) {
                     $errores[] = 'No tiene permiso para usar el proyecto seleccionado.';
@@ -81,8 +81,8 @@ class MinutaController {
     }
 
     public static function actualizar(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -97,11 +97,11 @@ class MinutaController {
         }
         $errores = Minuta::getErrores();
         // proyectos disponibles para selección según permisos
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
 
@@ -109,7 +109,7 @@ class MinutaController {
             $minuta->sincronizar($_POST['minuta']);
             $errores = $minuta->validarErrores();
             // validación de proyecto para no-admins
-            if(!isAdmin()) {
+            if(!esAdmin()) {
                 $allowedIds = array_map(fn($p) => $p->id, $proyectos);
                 $pid = $minuta->proyecto_id;
                 if(!in_array($pid, $allowedIds, true)) {
@@ -131,8 +131,8 @@ class MinutaController {
     }
 
     public static function eliminar() {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -141,17 +141,17 @@ class MinutaController {
                 $min = Minuta::find($id);
                 if($min) {
                     // si no es admin, comprobar permiso sobre proyecto
-                    if(isAdmin()) {
+                    if(esAdmin()) {
                         $min->eliminar();
-                        setFlashMessage('Minuta eliminada');
+                        establecerMensajeFlash('Minuta eliminada');
                     } else {
-                        $sql = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($min->proyecto_id) . " LIMIT 1";
+                        $sql = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($min->proyecto_id) . " LIMIT 1";
                         $perm = Permiso::consultaSQL($sql);
                         if(!empty($perm)) {
                             $min->eliminar();
-                            setFlashMessage('Minuta eliminada');
+                            establecerMensajeFlash('Minuta eliminada');
                         } else {
-                            setFlashMessage('No tiene permiso para eliminar esta minuta', 'error');
+                            establecerMensajeFlash('No tiene permiso para eliminar esta minuta', 'error');
                         }
                     }
                 }
@@ -161,7 +161,8 @@ class MinutaController {
     }
 
     public static function detalle(Router $router) {
-        ensureSession();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -175,6 +176,35 @@ class MinutaController {
             return;
         }
         $proyecto = Proyecto::find($minuta->proyecto_id);
+
+        // permisos: si no es administrador debe tener permiso sobre el proyecto
+        if(!esAdmin()) {
+            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) .
+                     " AND proyecto_id=" . intval($minuta->proyecto_id) . " LIMIT 1";
+            $perm = Permiso::consultaSQL($query);
+            if(empty($perm)) {
+                header('Location: /minutas');
+                return;
+            }
+        }
+
+        // si se solicita impresión, enviamos un HTML mínimo (sin layout) y cargamos estilos
+        if(isset($_GET['print'])) {
+            // variables para la vista
+            $minuta = $minuta;
+            $proyecto = $proyecto;
+            // HTML básico con hoja de estilos ya compilada
+            echo '<!DOCTYPE html>';
+            echo '<html lang="es"><head><meta charset="UTF-8">';
+            echo '<title>Minuta ' . htmlspecialchars($minuta->tituloJunta) . '</title>';
+            echo '<link rel="stylesheet" href="/css/custom.css">';
+            echo '</head><body>';
+            include __DIR__ . '/../views/minutas/detalle.php';
+            // el propio view incluye un script para window.print cuando hay ?print
+            echo '</body></html>';
+            exit;
+        }
+
         $router->render('minutas/detalle', [
             'minuta' => $minuta,
             'proyecto' => $proyecto

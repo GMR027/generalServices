@@ -9,6 +9,7 @@ use Model\Subdisciplina; ?>
     </div>
     <?php if(isset($canCreate) && $canCreate): ?>
     <div class="col s12 m6 right-align">
+        <a href="/reportes/galeria" class="btn grey btn-small" style="margin-right:1rem;"><i class="material-icons left">photo_library</i>Ver galería</a>
         <a href="/reportes/crear" class="btn green btn-small"><i class="material-icons left">add</i>Nuevo reporte</a>
     </div>
     <?php endif; ?>
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td><?php echo $r->horastrabajadas; ?></td>
                 <td>
                     <?php
-                    $canModify = isAdmin() || (isset($r->permiso_tipo) && $r->permiso_tipo === 'editar');
+                    $canModify = esAdmin() || (isset($r->permiso_tipo) && $r->permiso_tipo === 'editar');
                 ?>
                 <?php if($canModify): ?>
                     <a href="/reportes/editar?id=<?php echo $r->id; ?>" class="btn amber darken-2 btn-small"><i class="material-icons left">edit</i>Editar</a>

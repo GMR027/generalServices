@@ -1,4 +1,12 @@
-<h2>Panel de administración</h2>
+<div class="row valign-wrapper" style="margin-bottom:1rem;">
+    <div class="col s12 m6">
+        <h2>Panel de administración</h2>
+    </div>
+    <div class="col s12 m6 right-align">
+        <a href="/reportes/crear" class="btn green btn-small" style="margin-right:0.5rem;"><i class="material-icons left">add</i>Nuevo registro</a>
+        <a href="/reportes/galeria" class="btn grey btn-small"><i class="material-icons left">photo_library</i>Ver galería</a>
+    </div>
+</div>
 <p>Bienvenido al panel de control. Usa la barra de navegación para moverte entre las secciones.</p>
 
 <?php if(!empty(

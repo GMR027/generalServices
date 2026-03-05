@@ -8,7 +8,7 @@ use Model\Disciplina;
 
 class SubdisciplinaController {
     public static function index(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -19,7 +19,7 @@ class SubdisciplinaController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -44,7 +44,7 @@ class SubdisciplinaController {
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }

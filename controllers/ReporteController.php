@@ -12,17 +12,17 @@ use Intervention\Image\ImageManager;
 
 class ReporteController {
     public static function index(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         // determinar si el cliente puede crear reportes (tiene al menos un proyecto editable)
-        $canCreate = isAdmin();
+        $canCreate = esAdmin();
 
         // proyectos disponibles para filtro (todos para admin, sólo los permisos del cliente para usuarios normales)
-        if(isAdmin()) {
+        if(esAdmin()) {
             $filterProjects = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $filterProjects = Proyecto::consultaSQL($sql);
         }
 
@@ -33,7 +33,7 @@ class ReporteController {
         }
 
         // construir consulta principal
-        if(isAdmin()) {
+        if(esAdmin()) {
             // include discipline and subdiscipline via joins to avoid N+1
             $query = "SELECT r.*, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
                      "FROM reportes r " .
@@ -54,7 +54,7 @@ class ReporteController {
                      "JOIN proyectos p ON r.proyecto_id = p.id " .
                      "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
                      "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id " .
-                     "WHERE perm.cliente_id = " . intval($userId);
+                     "WHERE perm.cliente_id = " . intval($idUsuario);
             if(!empty($selected)) {
                 $query .= " AND r.proyecto_id IN (" . join(',', $selected) . ")";
             }
@@ -64,7 +64,7 @@ class ReporteController {
             $reportes = Reporte::consultaSQL($query);
 
             // comprobar si hay proyectos con permiso editar
-            $q2 = "SELECT 1 FROM permisos WHERE cliente_id=" . intval($userId) . " AND permiso='editar' LIMIT 1";
+            $q2 = "SELECT 1 FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND permiso='editar' LIMIT 1";
             $tmp = Permiso::consultaSQL($q2);
             if(!empty($tmp)) {
                 $canCreate = true;
@@ -78,18 +78,81 @@ class ReporteController {
         ]);
     }
 
-    public static function crear(Router $router) {
-        ensureSession();
-        $userId = idActual();
+    public static function galeria(Router $router) {
+        asegurarSesion();
+        $idUsuario = idActual();
 
-        if(isAdmin()) {
+        // proyectos disponibles para filtro
+        if(esAdmin()) {
+            $filterProjects = Proyecto::all();
+        } else {
+            $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
+            $filterProjects = Proyecto::consultaSQL($sql);
+        }
+
+        $selected = [];
+        if(isset($_GET['proyecto_id'])) {
+            $selected = array_map('intval', (array)$_GET['proyecto_id']);
+        }
+
+        // construir consulta similar a index pero sólo para reportes con imágenes
+        if(esAdmin()) {
+            $query = "SELECT r.*, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+                     "FROM reportes r " .
+                     "JOIN proyectos p ON r.proyecto_id = p.id " .
+                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
+                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id ";
+            $condiciones = [];
+            // sólo reportes con imágenes almacenadas
+            $condiciones[] = "r.imagenes IS NOT NULL AND r.imagenes <> '[]'";
+            if(!empty($selected)) {
+                $condiciones[] = "r.proyecto_id IN (" . join(',', $selected) . ")";
+            }
+            if(!empty($condiciones)) {
+                $query .= " WHERE " . join(' AND ', $condiciones);
+            }
+            if(Reporte::hasColumn('created_at')) {
+                $query .= " ORDER BY r.created_at DESC";
+            }
+            $reportes = Reporte::consultaSQL($query);
+        } else {
+            $query = "SELECT r.*, perm.permiso AS permiso_tipo, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+                     "FROM reportes r " .
+                     "JOIN permisos perm ON r.proyecto_id = perm.proyecto_id " .
+                     "JOIN proyectos p ON r.proyecto_id = p.id " .
+                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
+                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id " .
+                     "WHERE perm.cliente_id = " . intval($idUsuario) .
+                     " AND r.imagenes IS NOT NULL AND r.imagenes <> '[]'";
+            if(!empty($selected)) {
+                $query .= " AND r.proyecto_id IN (" . join(',', $selected) . ")";
+            }
+            if(Reporte::hasColumn('created_at')) {
+                $query .= " ORDER BY r.created_at DESC";
+            }
+            $reportes = Reporte::consultaSQL($query);
+        }
+
+        $router->render('reportes/galeria', [
+            'reportes' => $reportes,
+            'filterProjects' => $filterProjects,
+            'selectedProjects' => $selected
+        ]);
+    }
+
+    public static function crear(Router $router) {
+        asegurarSesion();
+        $idUsuario = idActual();
+
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             // solo proyectos con permiso editar para evitar que clientes con solo leer
             // puedan acceder al formulario
             $query = "SELECT p.* FROM permisos perm " .
                      "JOIN proyectos p ON perm.proyecto_id = p.id " .
-                     "WHERE perm.cliente_id = " . intval($userId) .
+                     "WHERE perm.cliente_id = " . intval($idUsuario) .
                      " AND perm.permiso = 'editar'";
             $proyectos = Proyecto::consultaSQL($query);
         }
@@ -116,7 +179,7 @@ class ReporteController {
             $reporte = new Reporte($_POST);
 
             // comprobar permiso sobre proyecto seleccionado (solo editar)
-            if(!isAdmin()) {
+            if(!esAdmin()) {
                 $allowedIds = array_map(fn($pr) => $pr->id, $proyectos);
                 if(!in_array($reporte->proyecto_id, $allowedIds, true)) {
                     $errores[] = 'No tiene permiso para crear un reporte en el proyecto seleccionado.';
@@ -149,7 +212,7 @@ class ReporteController {
             $errores = $reporte->validarErrores();
             if(empty($errores)) {
                 $reporte->guardar();
-                setFlashMessage('Reporte creado correctamente');
+                establecerMensajeFlash('Reporte creado correctamente');
                 header('Location: /reportes');
                 return; // evitar que se renderice el formulario y consuma el mensaje
             }
@@ -162,8 +225,8 @@ class ReporteController {
     }
 
     public static function eliminar() {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -190,18 +253,18 @@ class ReporteController {
                 }
             }
 
-            if(isAdmin()) {
+            if(esAdmin()) {
                 $reporte->eliminar();
-                setFlashMessage('Reporte eliminado');
+                establecerMensajeFlash('Reporte eliminado');
             } else {
                 // verify user has 'editar' permission on project
-                $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($reporte->proyecto_id) . " LIMIT 1";
+                $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($reporte->proyecto_id) . " LIMIT 1";
                 $perm = Permiso::consultaSQL($query);
                 if(!empty($perm) && $perm[0]->permiso === 'editar') {
                     $reporte->eliminar();
-                    setFlashMessage('Reporte eliminado');
+                    establecerMensajeFlash('Reporte eliminado');
                 } else {
-                    setFlashMessage('No tienes permiso para eliminar este reporte', 'error');
+                    establecerMensajeFlash('No tienes permiso para eliminar este reporte', 'error');
                 }
             }
             header('Location: /reportes');
@@ -209,8 +272,8 @@ class ReporteController {
     }
 
     public static function editar(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         // aceptar id por GET cuando se carga el formulario o por POST tras el submit
         $id = $_GET['id'] ?? $_POST['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -225,26 +288,26 @@ class ReporteController {
         }
         /** @var Reporte $reporte */
 // permission check for client; require permiso 'editar' to modify
-        if(!isAdmin()) {
-            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) . " AND proyecto_id=" . intval($reporte->proyecto_id) . " LIMIT 1";
+        if(!esAdmin()) {
+            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) . " AND proyecto_id=" . intval($reporte->proyecto_id) . " LIMIT 1";
             $perm = Permiso::consultaSQL($query);
             if(empty($perm) || $perm[0]->permiso !== 'editar') {
                 // no permiso o sólo lectura
-                setFlashMessage('No tienes permiso para modificar este reporte', 'error');
+                establecerMensajeFlash('No tienes permiso para modificar este reporte', 'error');
                 header('Location: /reportes');
                 return;
             }
         }
 
         $errores = Reporte::getErrores();
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             // sólo proyectos con permiso de edición (deberíamos haber bloqueado el acceso
             // si ya no existiera, pero así evitamos mostrarlos en el selector)
             $query = "SELECT p.* FROM permisos perm " .
                      "JOIN proyectos p ON perm.proyecto_id = p.id " .
-                     "WHERE perm.cliente_id = " . intval($userId) .
+                     "WHERE perm.cliente_id = " . intval($idUsuario) .
                      " AND perm.permiso = 'editar'";
             $proyectos = Proyecto::consultaSQL($query);
         }
@@ -289,7 +352,7 @@ class ReporteController {
             $errores = $reporte->validarErrores();
             if(empty($errores)) {
                 $reporte->guardar();
-                setFlashMessage('Reporte actualizado correctamente');
+                establecerMensajeFlash('Reporte actualizado correctamente');
                 header('Location: /reportes');
                 return; // detener aquí para que el flash no se consuma por el render
             }
@@ -303,8 +366,8 @@ class ReporteController {
     }
 
     public static function detalle(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -317,8 +380,8 @@ class ReporteController {
             return;
         }
         /** @var Reporte $reporte */
-        if(!isAdmin()) {
-            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($userId) .
+        if(!esAdmin()) {
+            $query = "SELECT * FROM permisos WHERE cliente_id=" . intval($idUsuario) .
                      " AND proyecto_id=" . intval($reporte->proyecto_id) . " LIMIT 1";
             $perm = Permiso::consultaSQL($query);
             if(empty($perm)) {

@@ -7,12 +7,12 @@ Con los usuarios y el login funcionando, es hora de restringir el acceso según 
 En `includes/funciones.php` añadimos varias funciones para trabajar con el usuario autenticado y su rol:
 
 ```php
-function isAdmin(): bool {
+function esAdmin(): bool {
     session_start();
     return isset($_SESSION['rol']) && $_SESSION['rol'] === 'admin';
 }
 
-function isCliente(): bool {
+function esCliente(): bool {
     session_start();
     return isset($_SESSION['rol']) && $_SESSION['rol'] === 'cliente';
 }
@@ -63,7 +63,7 @@ En el método `comprobarRutas()` del router, esa lista se verifica y redirige a 
 if(in_array($urlActual, $rutasProtegidas)) {
     if(!isset($_SESSION['login'])) {
         header('Location: /login');
-    } else if(!isAdmin()) {
+    } else if(!esAdmin()) {
         // si el usuario es cliente y trata de acceder a una ruta de administración
         header('Location: /');
     }
@@ -80,7 +80,7 @@ Es buena práctica verificar el rol al inicio de cada método de un controlador 
 
 ```php
 public static function index(Router $router) {
-    if(!isAdmin()) {
+    if(!esAdmin()) {
         header('Location: /');
         return;
     }

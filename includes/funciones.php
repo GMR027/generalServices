@@ -20,25 +20,25 @@ function validarId(string $url) {
     return $id;
 }
 
-function ensureSession() {
+function asegurarSesion() {
     if(session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
 }
 
-function isAdmin(): bool {
-    ensureSession();
+function esAdmin(): bool {
+    asegurarSesion();
     return isset($_SESSION['rol']) && $_SESSION['rol'] === 'admin';
 }
 
-function isCliente(): bool {
-    ensureSession();
+function esCliente(): bool {
+    asegurarSesion();
     return isset($_SESSION['rol']) && $_SESSION['rol'] === 'cliente';
 }
 
 // flash message helpers
-function setFlashMessage(string $mensaje, string $tipo = 'success') {
-    ensureSession();
+function establecerMensajeFlash(string $mensaje, string $tipo = 'success') {
+    asegurarSesion();
     // almacenamos texto y tipo (success, error, info, etc.)
     $_SESSION['mensaje'] = ['texto' => $mensaje, 'tipo' => $tipo];
 }
@@ -49,8 +49,8 @@ function setFlashMessage(string $mensaje, string $tipo = 'success') {
  *
  * @return null|array
  */
-function getFlashMessage() {
-    ensureSession();
+function obtenerMensajeFlash() {
+    asegurarSesion();
     $msg = $_SESSION['mensaje'] ?? null;
     if($msg) {
         unset($_SESSION['mensaje']);
@@ -59,17 +59,17 @@ function getFlashMessage() {
 }
 
 function usuarioActual(): ?string {
-    ensureSession();
+    asegurarSesion();
     // email stored during autenticación
     return $_SESSION['correo'] ?? null;
 }
 
 function idActual(): ?int {
-    ensureSession();
+    asegurarSesion();
     return isset($_SESSION['id']) ? intval($_SESSION['id']) : null;
 }
 
 function rolActual(): ?string {
-    ensureSession();
+    asegurarSesion();
     return $_SESSION['rol'] ?? null;
 }

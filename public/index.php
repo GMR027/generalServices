@@ -100,6 +100,9 @@ $router->post('/reportes/editar', [ReporteController::class, 'editar']);
 $router->get('/reportes/detalle', [ReporteController::class, 'detalle']);
 $router->post('/reportes/eliminar', [ReporteController::class, 'eliminar']);
 
+// galería de fotos asociadas a reportes
+$router->get('/reportes/galeria', [ReporteController::class, 'galeria']);
+
 // CRUD categorías (administrador)
 use Controllers\CategoriaController;
 $router->get('/categorias', [CategoriaController::class, 'index']);

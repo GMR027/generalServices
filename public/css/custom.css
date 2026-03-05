@@ -177,6 +177,34 @@ nav .sidenav-trigger {
   font-size: 1.5rem;
 }
 
+/* minor tweaks when exporting minuta content to PDF/print */
+.minuta-detalle p,
+.minuta-detalle h2,
+.minuta-detalle h5 {
+  font-size: 0.95rem;
+}
+.minuta-detalle {
+  /* allow space adjustments if needed */
+}
+
+/* hide interactive controls when printing */
+@media print {
+  header,
+  footer,
+  .sidenav,
+  .btn,
+  .right-align a {
+    display: none !important;
+  }
+
+  /* expand container to full width in print-only view */
+  .container {
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
 .img-modal .img-wrapper {
   position: relative;
 }

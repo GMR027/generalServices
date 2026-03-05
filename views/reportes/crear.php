@@ -6,7 +6,7 @@
     <?php endforeach; ?>
 <?php endif; ?>
 
-<?php if(empty($proyectos) && !isAdmin()): ?>
+<?php if(empty($proyectos) && !esAdmin()): ?>
     <div class="alerta error">No tienes proyectos con permiso de edición. No puedes crear reportes.</div>
 <?php else: ?>
 <form method="POST" action="/reportes/crear" enctype="multipart/form-data" class="formulario">

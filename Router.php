@@ -49,7 +49,7 @@ class Router {
         header('location: /login');
       } else {
         // solo administradores pueden acceder a estas rutas
-        if(function_exists('isAdmin') && !isAdmin()) {
+        if(function_exists('esAdmin') && !esAdmin()) {
           header('location: /');
         }
       }

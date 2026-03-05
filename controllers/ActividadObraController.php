@@ -9,15 +9,15 @@ use Model\Permiso;
 
 class ActividadObraController {
     public static function index(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
 
         // proyectos disponibles para filtro (todos para admin, permisos para cliente)
-        if(isAdmin()) {
+        if(esAdmin()) {
             $filterProjects = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $filterProjects = Proyecto::consultaSQL($sql);
         }
 
@@ -26,7 +26,7 @@ class ActividadObraController {
             $selected = array_map('intval', (array)$_GET['proyecto_id']);
         }
 
-        if(isAdmin()) {
+        if(esAdmin()) {
             $query = "SELECT a.*, p.nombre AS proyecto_nombre " .
                      "FROM actividades_obra a " .
                      "JOIN proyectos p ON a.proyecto_id = p.id";
@@ -40,7 +40,7 @@ class ActividadObraController {
                      "FROM actividades_obra a " .
                      "JOIN permisos perm ON a.proyecto_id = perm.proyecto_id " .
                      "JOIN proyectos p ON a.proyecto_id = p.id " .
-                     "WHERE perm.cliente_id = " . intval($userId);
+                     "WHERE perm.cliente_id = " . intval($idUsuario);
             if(!empty($selected)) {
                 $query .= " AND a.proyecto_id IN (" . join(',', $selected) . ")";
             }
@@ -56,14 +56,14 @@ class ActividadObraController {
     }
 
     public static function crear(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
 
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
 
@@ -82,7 +82,7 @@ class ActividadObraController {
             }
 
             $errores = $actividad->validarErrores();
-            if(!isAdmin()) {
+            if(!esAdmin()) {
                 $allowed = array_map(fn($p) => $p->id, $proyectos);
                 if(!in_array($actividad->proyecto_id, $allowed, true)) {
                     $errores[] = 'No tiene permiso para el proyecto seleccionado.';
@@ -90,7 +90,7 @@ class ActividadObraController {
             }
             if(empty($errores)) {
                 $actividad->guardar();
-                setFlashMessage('Actividad guardada correctamente');
+                establecerMensajeFlash('Actividad guardada correctamente');
                 header('Location: /p-obra');
                 return;
             }
@@ -104,8 +104,8 @@ class ActividadObraController {
     }
 
     public static function editar(Router $router) {
-        ensureSession();
-        $userId = idActual();
+        asegurarSesion();
+        $idUsuario = idActual();
         $id = $_GET['id'] ?? $_POST['actividad']['id'] ?? null;
         $id = filter_var($id, FILTER_VALIDATE_INT);
         if(!$id) {
@@ -119,11 +119,11 @@ class ActividadObraController {
         }
 
         $errores = ActividadObra::getErrores();
-        if(isAdmin()) {
+        if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
             $sql = "SELECT p.* FROM permisos perm JOIN proyectos p ON perm.proyecto_id = p.id " .
-                   "WHERE perm.cliente_id = " . intval($userId);
+                   "WHERE perm.cliente_id = " . intval($idUsuario);
             $proyectos = Proyecto::consultaSQL($sql);
         }
 
@@ -139,7 +139,7 @@ class ActividadObraController {
             $errores = $actividad->validarErrores();
             if(empty($errores)) {
                 $actividad->guardar();
-                setFlashMessage('Actividad actualizada correctamente');
+                establecerMensajeFlash('Actividad actualizada correctamente');
                 header('Location: /p-obra');
                 return;
             }
@@ -153,7 +153,7 @@ class ActividadObraController {
     }
 
     public static function eliminar() {
-        ensureSession();
+        asegurarSesion();
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id'] ?? null;
             $id = filter_var($id, FILTER_VALIDATE_INT);
@@ -161,7 +161,7 @@ class ActividadObraController {
                 $act = ActividadObra::find($id);
                 if($act) {
                     $act->eliminar();
-                    setFlashMessage('Actividad eliminada');
+                    establecerMensajeFlash('Actividad eliminada');
                 }
             }
             header('Location: /p-obra');

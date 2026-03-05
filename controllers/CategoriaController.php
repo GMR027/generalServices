@@ -7,7 +7,7 @@ use Model\Categoria;
 
 class CategoriaController {
     public static function index(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -18,7 +18,7 @@ class CategoriaController {
     }
 
     public static function crear(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -42,7 +42,7 @@ class CategoriaController {
     }
 
     public static function actualizar(Router $router) {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -76,7 +76,7 @@ class CategoriaController {
     }
 
     public static function eliminar() {
-        if(!\isAdmin()) {
+        if(!\esAdmin()) {
             header('Location: /');
             return;
         }
@@ -87,7 +87,7 @@ class CategoriaController {
                 $cat = Categoria::find($id);
                 if($cat) {
                     $cat->eliminar();
-                    setFlashMessage('Categoría eliminada');
+                    establecerMensajeFlash('Categoría eliminada');
                 }
             }
             header('Location: /categorias');

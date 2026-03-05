@@ -79,8 +79,8 @@ class Usuario extends ActiveRecord {
 
     public function autenticar() {
         // ensure session started without duplicate warnings
-        if(function_exists('ensureSession')) {
-            ensureSession();
+        if(function_exists('asegurarSesion')) {
+            asegurarSesion();
         } else {
             if(session_status() !== PHP_SESSION_ACTIVE) session_start();
         }
@@ -92,8 +92,8 @@ class Usuario extends ActiveRecord {
         $_SESSION['login'] = true;
 
         // mensaje de bienvenida
-        if(function_exists('setFlashMessage')) {
-            setFlashMessage('Bienvenido ' . $this->nombre . ' (' . $this->rol . ')');
+        if(function_exists('establecerMensajeFlash')) {
+            establecerMensajeFlash('Bienvenido ' . $this->nombre . ' (' . $this->rol . ')');
         } else {
             $_SESSION['mensaje'] = 'Bienvenido ' . $this->nombre . ' (' . $this->rol . ')';
         }
