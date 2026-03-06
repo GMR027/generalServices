@@ -1,6 +1,5 @@
-<?php use Model\Proyecto;
-use Model\Disciplina;
-use Model\Subdisciplina; ?>
+<?php use Model\Proyecto; ?>
+
 
 
 <div class="container reporte-detalle">
@@ -8,12 +7,13 @@ use Model\Subdisciplina; ?>
     <?php if(isset($reporte->created_at)): ?>
         <p class="small">Creado: <?php echo date('d\/m\/Y', strtotime($reporte->created_at)); ?></p>
     <?php endif; ?>
+    <?php if(isset($reporte->subdisciplina_nombre)): ?>
+        <p class="small">Subdisciplina: <?php echo htmlspecialchars($reporte->subdisciplina_nombre); ?></p>
+    <?php endif; ?>
     <div class="responsive-table">
     <table class="tabla-datos">
         <tr>
             <th>Proyecto</th>
-            <th>Disciplina</th>
-            <th>Subdisciplina</th>
             <th>Área/Zona</th>
             <th>Nivel</th>
             <th>Permiso trabajo</th>
@@ -23,8 +23,6 @@ use Model\Subdisciplina; ?>
             <?php /** @var Proyecto|null $proj */
             $proj = Proyecto::find($reporte->proyecto_id); ?>
             <td><?php echo $proj->nombre ?? '-'; ?></td>
-            <td><?php echo Disciplina::find($proj->disciplina_id)->nombre ?? '-'; ?></td>
-            <td><?php echo Subdisciplina::find($proj->subdisciplina_id)->nombre ?? '-'; ?></td>
             <td><?php echo $reporte->area_zonal; ?></td>
             <td><?php echo $reporte->nivel; ?></td>
             <td><?php echo $reporte->permisoTrabajo; ?></td>

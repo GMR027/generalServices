@@ -86,3 +86,23 @@ Una vez implementes el CRUD y los modelos, podrás asignar disciplinas y proyect
 ---
 
 El siguiente paso será generar los modelos y controladores mencionados. Podemos empezar por la tabla `disciplinas` y su CRUD.
+
+> **Actualización:** más adelante se decidió simplificar la tabla de proyectos y eliminar las columnas `disciplina_id` y `subdisciplina_id`. Los formularios y consultas ya no las incluyen y deben quitarse de la base de datos con:
+> ```sql
+> ALTER TABLE proyectos
+>   DROP FOREIGN KEY proyectos_ibfk_1,
+>   DROP FOREIGN KEY proyectos_ibfk_2,
+>   DROP COLUMN disciplina_id,
+>   DROP COLUMN subdisciplina_id;
+> ```
+> Esta documentación permanece para el histórico, pero el modelo `Proyecto` se ajustó en el código.
+
+A su vez se decidió almacenar dicha información directamente en la tabla `reportes`. Para añadir la columna correspondiente ejecuta:
+
+```sql
+ALTER TABLE reportes
+  ADD COLUMN subdisciplina_id INT NULL AFTER proyecto_id,
+  ADD FOREIGN KEY (subdisciplina_id) REFERENCES subdisciplinas(id);
+```
+
+Posteriormente se actualizó el modelo `Reporte` y los formularios para permitir al usuario especificar la subdisciplina asociada a cada reporte.

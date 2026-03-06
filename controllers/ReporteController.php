@@ -6,6 +6,7 @@ use MVC\Router;
 use Model\Reporte;
 use Model\Proyecto;
 use Model\Permiso;
+use Model\Subdisciplina;
 // Intervention Image for handling uploads (v3 uses ImageManager)
 use Intervention\Image\ImageManager;
 
@@ -25,38 +26,51 @@ class ReporteController {
                    "WHERE perm.cliente_id = " . intval($idUsuario);
             $filterProjects = Proyecto::consultaSQL($sql);
         }
+        // subdisciplinas para filtrado y selector (siempre completo)
+        $filterSubdisciplinas = \Model\Subdisciplina::all();
 
-        // recoger proyectos seleccionados en el filtro (puede ser array)
+        // recoger proyectos o subdisciplinas seleccionados en el filtro
         $selected = [];
         if(isset($_GET['proyecto_id'])) {
             $selected = array_map('intval', (array)$_GET['proyecto_id']);
         }
+        $selectedSub = [];
+        if(isset($_GET['subdisciplina_id'])) {
+            $selectedSub = array_map('intval', (array)$_GET['subdisciplina_id']);
+        }
 
-        // construir consulta principal
+        // construir consulta principal (index)
         if(esAdmin()) {
-            // include discipline and subdiscipline via joins to avoid N+1
-            $query = "SELECT r.*, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+            $query = "SELECT r.*, sd.nombre AS subdisciplina_nombre " .
                      "FROM reportes r " .
                      "JOIN proyectos p ON r.proyecto_id = p.id " .
-                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
-                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id ";
+                     "LEFT JOIN subdisciplinas sd ON r.subdisciplina_id = sd.id";
+            $conditions = [];
             if(!empty($selected)) {
-                $query .= " WHERE r.proyecto_id IN (" . join(',', $selected) . ")";
+                $conditions[] = "r.proyecto_id IN (" . join(',', $selected) . ")";
+            }
+            if(!empty($selectedSub)) {
+                $conditions[] = "r.subdisciplina_id IN (" . join(',', $selectedSub) . ")";
+            }
+            if(!empty($conditions)) {
+                $query .= " WHERE " . join(' AND ', $conditions);
             }
             if(Reporte::hasColumn('created_at')) {
                 $query .= " ORDER BY r.created_at DESC";
             }
             $reportes = Reporte::consultaSQL($query);
         } else {
-            $query = "SELECT r.*, perm.permiso AS permiso_tipo, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+            $query = "SELECT r.*, perm.permiso AS permiso_tipo, sd.nombre AS subdisciplina_nombre " .
                      "FROM reportes r " .
                      "JOIN permisos perm ON r.proyecto_id = perm.proyecto_id " .
                      "JOIN proyectos p ON r.proyecto_id = p.id " .
-                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
-                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id " .
+                     "LEFT JOIN subdisciplinas sd ON r.subdisciplina_id = sd.id " .
                      "WHERE perm.cliente_id = " . intval($idUsuario);
             if(!empty($selected)) {
                 $query .= " AND r.proyecto_id IN (" . join(',', $selected) . ")";
+            }
+            if(!empty($selectedSub)) {
+                $query .= " AND r.subdisciplina_id IN (" . join(',', $selectedSub) . ")";
             }
             if(Reporte::hasColumn('created_at')) {
                 $query .= " ORDER BY r.created_at DESC";
@@ -74,7 +88,9 @@ class ReporteController {
             'reportes' => $reportes,
             'canCreate' => $canCreate,
             'filterProjects' => $filterProjects,
-            'selectedProjects' => $selected
+            'selectedProjects' => $selected,
+            'filterSubdisciplinas' => $filterSubdisciplinas,
+            'selectedSubdisciplinas' => $selectedSub
         ]);
     }
 
@@ -95,40 +111,44 @@ class ReporteController {
         if(isset($_GET['proyecto_id'])) {
             $selected = array_map('intval', (array)$_GET['proyecto_id']);
         }
+        $selectedSub = [];
+        if(isset($_GET['subdisciplina_id'])) {
+            $selectedSub = array_map('intval', (array)$_GET['subdisciplina_id']);
+        }
 
         // construir consulta similar a index pero sólo para reportes con imágenes
         if(esAdmin()) {
-            $query = "SELECT r.*, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+            $query = "SELECT r.*, sd.nombre AS subdisciplina_nombre " .
                      "FROM reportes r " .
-                     "JOIN proyectos p ON r.proyecto_id = p.id " .
-                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
-                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id ";
-            $condiciones = [];
+                     "LEFT JOIN subdisciplinas sd ON r.subdisciplina_id = sd.id";
+            $conditions = [];
             // sólo reportes con imágenes almacenadas
-            $condiciones[] = "r.imagenes IS NOT NULL AND r.imagenes <> '[]'";
+            $conditions[] = "r.imagenes IS NOT NULL AND r.imagenes <> '[]'";
             if(!empty($selected)) {
-                $condiciones[] = "r.proyecto_id IN (" . join(',', $selected) . ")";
+                $conditions[] = "r.proyecto_id IN (" . join(',', $selected) . ")";
             }
-            if(!empty($condiciones)) {
-                $query .= " WHERE " . join(' AND ', $condiciones);
+            if(!empty($selectedSub)) {
+                $conditions[] = "r.subdisciplina_id IN (" . join(',', $selectedSub) . ")";
+            }
+            if(!empty($conditions)) {
+                $query .= " WHERE " . join(' AND ', $conditions);
             }
             if(Reporte::hasColumn('created_at')) {
                 $query .= " ORDER BY r.created_at DESC";
             }
             $reportes = Reporte::consultaSQL($query);
         } else {
-            $query = "SELECT r.*, perm.permiso AS permiso_tipo, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+            $query = "SELECT r.*, perm.permiso AS permiso_tipo, sd.nombre AS subdisciplina_nombre " .
                      "FROM reportes r " .
                      "JOIN permisos perm ON r.proyecto_id = perm.proyecto_id " .
-                     "JOIN proyectos p ON r.proyecto_id = p.id " .
-                     "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
-                     "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id " .
+                     "LEFT JOIN subdisciplinas sd ON r.subdisciplina_id = sd.id " .
                      "WHERE perm.cliente_id = " . intval($idUsuario) .
                      " AND r.imagenes IS NOT NULL AND r.imagenes <> '[]'";
             if(!empty($selected)) {
                 $query .= " AND r.proyecto_id IN (" . join(',', $selected) . ")";
             }
-            if(Reporte::hasColumn('created_at')) {
+            if(!empty($selectedSub)) {
+                $query .= " AND r.subdisciplina_id IN (" . join(',', $selectedSub) . ")";
                 $query .= " ORDER BY r.created_at DESC";
             }
             $reportes = Reporte::consultaSQL($query);
@@ -137,7 +157,9 @@ class ReporteController {
         $router->render('reportes/galeria', [
             'reportes' => $reportes,
             'filterProjects' => $filterProjects,
-            'selectedProjects' => $selected
+            'filterSubdisciplinas' => \Model\Subdisciplina::all(),
+            'selectedProjects' => $selected,
+            'selectedSubdisciplinas' => $selectedSub
         ]);
     }
 
@@ -162,6 +184,8 @@ class ReporteController {
         if(!$reporte->imagenes) {
             $reporte->imagenes = json_encode([]);
         }
+        // cargar lista de subdisciplinas para selector
+        $subdisciplinas = \Model\Subdisciplina::all();
         // si llega proyecto_id en query, lo usamos para selección inicial
         if(isset($_GET['proyecto_id'])) {
             $pid = intval($_GET['proyecto_id']);
@@ -220,7 +244,9 @@ class ReporteController {
 
         $router->render('reportes/crear', [
             'proyectos' => $proyectos,
-            'reporte' => $reporte
+            'subdisciplinas' => $subdisciplinas,
+            'reporte' => $reporte,
+            'errores' => $errores ?? []
         ]);
     }
 
@@ -300,6 +326,8 @@ class ReporteController {
         }
 
         $errores = Reporte::getErrores();
+        // cargar subdisciplinas también
+        $subdisciplinas = \Model\Subdisciplina::all();
         if(esAdmin()) {
             $proyectos = Proyecto::all();
         } else {
@@ -361,7 +389,8 @@ class ReporteController {
         $router->render('reportes/editar', [
             'reporte' => $reporte,
             'errores' => $errores,
-            'proyectos' => $proyectos
+            'proyectos' => $proyectos,
+            'subdisciplinas' => $subdisciplinas
         ]);
     }
 

@@ -13,18 +13,30 @@ class AdminController {
 
         // proyectos para filtro
         $filterProjects = Proyecto::all();
+        // también subdisciplinas
+        $filterSubdisciplinas = \Model\Subdisciplina::all();
         $selected = [];
         if(isset($_GET['proyecto_id'])) {
             $selected = array_map('intval', (array)$_GET['proyecto_id']);
         }
+        $selectedSub = [];
+        if(isset($_GET['subdisciplina_id'])) {
+            $selectedSub = array_map('intval', (array)$_GET['subdisciplina_id']);
+        }
 
-        $query = "SELECT r.*, p.nombre AS proyecto_nombre, d.nombre AS disciplina_nombre, sd.nombre AS subdisciplina_nombre " .
+        $query = "SELECT r.*, p.nombre AS proyecto_nombre, sd.nombre AS subdisciplina_nombre " .
                  "FROM reportes r " .
                  "JOIN proyectos p ON r.proyecto_id = p.id " .
-                 "LEFT JOIN disciplinas d ON p.disciplina_id = d.id " .
-                 "LEFT JOIN subdisciplinas sd ON p.subdisciplina_id = sd.id";
+                 "LEFT JOIN subdisciplinas sd ON r.subdisciplina_id = sd.id";
+        $conditions = [];
         if(!empty($selected)) {
-            $query .= " WHERE r.proyecto_id IN (" . join(',', $selected) . ")";
+            $conditions[] = "r.proyecto_id IN (" . join(',', $selected) . ")";
+        }
+        if(!empty($selectedSub)) {
+            $conditions[] = "r.subdisciplina_id IN (" . join(',', $selectedSub) . ")";
+        }
+        if(!empty($conditions)) {
+            $query .= " WHERE " . join(' AND ', $conditions);
         }
         if(Reporte::hasColumn('created_at')) {
             $query .= " ORDER BY r.created_at DESC";
@@ -34,7 +46,9 @@ class AdminController {
         $router->render('admin/index', [
             'reportes' => $reportes,
             'filterProjects' => $filterProjects,
-            'selectedProjects' => $selected
+            'filterSubdisciplinas' => $filterSubdisciplinas,
+            'selectedProjects' => $selected,
+            'selectedSubdisciplinas' => $selectedSub
         ]);
     }
 }

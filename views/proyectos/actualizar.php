@@ -11,21 +11,6 @@
     <label for="ubicacion">Ubicación:</label>
     <input type="text" name="proyecto[ubicacion]" id="ubicacion" value="<?php echo $proyecto->ubicacion; ?>">
 
-    <label for="disciplina_id">Disciplina:</label>
-    <select name="proyecto[disciplina_id]" id="disciplina_id">
-        <option value="">-- Seleccione --</option>
-        <?php foreach($disciplinas as $d): ?>
-            <option value="<?php echo $d->id; ?>" <?php echo $proyecto->disciplina_id == $d->id ? 'selected' : ''; ?>><?php echo $d->nombre; ?></option>
-        <?php endforeach; ?>
-    </select>
-
-    <label for="subdisciplina_id">Subdisciplina:</label>
-    <select name="proyecto[subdisciplina_id]" id="subdisciplina_id">
-        <option value="">-- Seleccione --</option>
-        <?php foreach($subdisciplinas as $s): ?>
-            <option value="<?php echo $s->id; ?>" <?php echo $proyecto->subdisciplina_id == $s->id ? 'selected' : ''; ?>><?php echo $s->nombre; ?></option>
-        <?php endforeach; ?>
-    </select>
 
     <label for="fecha_inicio">Fecha inicio:</label>
     <input type="date" name="proyecto[fecha_inicio]" id="fecha_inicio" value="<?php echo $proyecto->fecha_inicio; ?>">

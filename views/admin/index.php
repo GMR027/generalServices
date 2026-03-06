@@ -13,7 +13,7 @@
     $filterProjects ?? []
 )): ?>
 <form method="GET" class="row" style="margin-top:1rem;">
-    <div class="input-field col s12 m6">
+    <div class="input-field col s12 m4">
         <select name="proyecto_id[]" multiple>
             <option value="" disabled>Selecciona proyectos</option>
             <?php foreach($filterProjects as $fp): ?>
@@ -22,7 +22,16 @@
         </select>
         <label>Filtrar por proyecto</label>
     </div>
-    <div class="col s12 m6" style="margin-top:1.5rem;">
+    <div class="input-field col s12 m4">
+        <select name="subdisciplina_id[]" multiple>
+            <option value="" disabled>Selecciona subdisciplinas</option>
+            <?php foreach($filterSubdisciplinas as $sd): ?>
+                <option value="<?php echo $sd->id; ?>" <?php echo in_array($sd->id, $selectedSubdisciplinas ?? []) ? 'selected' : ''; ?>><?php echo $sd->nombre; ?></option>
+            <?php endforeach; ?>
+        </select>
+        <label>Filtrar por subdisciplina</label>
+    </div>
+    <div class="col s12 m4" style="margin-top:1.5rem;">
         <button type="submit" class="btn blue">Aplicar filtro</button>
         <a href="/admin" class="btn grey">Limpiar</a>
     </div>
@@ -37,7 +46,6 @@
             <th>ID</th>
             <th>Fecha</th>
             <th>Proyecto</th>
-            <th>Disciplina</th>
             <th>Subdisciplina</th>
             <th class="col-actividad">Actividad</th>
             <th>Área/Zona</th>
@@ -54,7 +62,7 @@
                 <td><?php echo $r->id; ?></td>
                 <td><?php echo isset($r->created_at) ? date('d/m/Y', strtotime($r->created_at)) : '-'; ?></td>
                 <td><?php echo $r->proyecto_nombre ?? '-'; ?></td>
-                <td><?php echo $r->disciplina_nombre ?? '-'; ?></td>
+
                 <td><?php echo $r->subdisciplina_nombre ?? '-'; ?></td>
                 <td><?php echo htmlspecialchars(
                     strlen($r->actividad) > 40 ? substr($r->actividad,0,40) . '...' : $r->actividad

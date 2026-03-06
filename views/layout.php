@@ -12,10 +12,11 @@
 </head>
 <body>
     <?php
-        $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
-        function isActive($path, $current) {
-            // return true if $current starts with $path
-            return strpos($current, $path) === 0;
+        // ruta actual solicitada por el usuario
+        $rutaActual = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+        function estaActivo($ruta, $actual) {
+            // devuelve verdadero si $actual comienza con $ruta
+            return strpos($actual, $ruta) === 0;
         }
     ?>
     <header>
@@ -23,7 +24,7 @@
             <div class="nav-wrapper container">
                 <a href="/" class="brand-logo">GS</a>
                 <ul class="right hide-on-med-and-down" style="margin-left:auto;">
-                    <li class="<?php echo isActive('/', $currentPath) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
+                    <li class="<?php echo estaActivo('/', $rutaActual) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
                     <?php if(usuarioActual()): ?>
                         <li><a class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
                         <li><a href="/logout" class="red">Cerrar sesión</a></li>
@@ -37,26 +38,26 @@
                 <ul class="right hide-on-med-and-down">
                     <?php if(usuarioActual()): ?>
                         <?php if(rolActual() === 'admin'): ?>
-                            <li class="<?php echo isActive('/admin', $currentPath) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
-                            <li class="<?php echo isActive('/disciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
-                            <li class="<?php echo isActive('/subdisciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
-                            <li class="<?php echo isActive('/clientes', $currentPath) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
-                            <li class="<?php echo isActive('/empresas', $currentPath) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
-                            <li class="<?php echo isActive('/proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
-                            <li class="<?php echo isActive('/permisos', $currentPath) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
-                            <li class="<?php echo isActive('/categorias', $currentPath) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
-                            <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
-                            <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
-                            <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
+                            <li class="<?php echo estaActivo('/admin', $rutaActual) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
+                            <li class="<?php echo estaActivo('/disciplinas', $rutaActual) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
+                            <li class="<?php echo estaActivo('/subdisciplinas', $rutaActual) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
+                            <li class="<?php echo estaActivo('/clientes', $rutaActual) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
+                            <li class="<?php echo estaActivo('/empresas', $rutaActual) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
+                            <li class="<?php echo estaActivo('/proyectos', $rutaActual) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
+                            <li class="<?php echo estaActivo('/permisos', $rutaActual) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
+                            <li class="<?php echo estaActivo('/categorias', $rutaActual) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
+                            <li class="<?php echo estaActivo('/bitacora', $rutaActual) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                            <li class="<?php echo estaActivo('/minutas', $rutaActual) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                            <li class="<?php echo estaActivo('/p-obra', $rutaActual) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
                         <?php endif; ?>
                         <?php if(rolActual() === 'cliente'): ?>
-                            <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
-                            <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
-                            <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
-                            <li class="<?php echo isActive('/reportes/galeria', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>
-                            <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
-                            <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
-                            <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
+                            <li class="<?php echo estaActivo('/mis-proyectos', $rutaActual) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
+                            <li class="<?php echo estaActivo('/reportes/crear', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
+                            <li class="<?php echo estaActivo('/reportes', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>
+                            <li class="<?php echo estaActivo('/reportes/galeria', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>
+                            <li class="<?php echo estaActivo('/bitacora', $rutaActual) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                            <li class="<?php echo estaActivo('/minutas', $rutaActual) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                            <li class="<?php echo estaActivo('/p-obra', $rutaActual) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
                         <?php endif; ?>
                     <?php endif; ?>
                 </ul>
@@ -64,7 +65,7 @@
             </div>
         </nav>
         <ul class="sidenav" id="mobile-main">
-            <li class="<?php echo isActive('/', $currentPath) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
+            <li class="<?php echo estaActivo('/', $rutaActual) ? 'active' : ''; ?>"><a href="/">Inicio</a></li>
             <?php if(usuarioActual()): ?>
                 <li><a class="disabled"><?php echo usuarioActual(); ?> (<?php echo rolActual(); ?>)</a></li>
                 <li><a href="/logout" class="red">Cerrar sesión</a></li>
@@ -73,23 +74,23 @@
         <ul class="sidenav" id="mobile-secondary">
             <?php if(usuarioActual()): ?>
                 <?php if(rolActual() === 'admin'): ?>
-                    <li class="<?php echo isActive('/admin', $currentPath) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
-                    <li class="<?php echo isActive('/disciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
-                    <li class="<?php echo isActive('/subdisciplinas', $currentPath) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
-                    <li class="<?php echo isActive('/clientes', $currentPath) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
-                    <li class="<?php echo isActive('/empresas', $currentPath) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
-                    <li class="<?php echo isActive('/proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
-                    <li class="<?php echo isActive('/permisos', $currentPath) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
-                    <li class="<?php echo isActive('/categorias', $currentPath) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
-                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
-                    <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                    <li class="<?php echo estaActivo('/admin', $rutaActual) ? 'active' : ''; ?>"><a href="/admin">Home Admin</a></li>
+                    <li class="<?php echo estaActivo('/disciplinas', $rutaActual) ? 'active' : ''; ?>"><a href="/disciplinas">Disciplinas</a></li>
+                    <li class="<?php echo estaActivo('/subdisciplinas', $rutaActual) ? 'active' : ''; ?>"><a href="/subdisciplinas">Subdisciplinas</a></li>
+                    <li class="<?php echo estaActivo('/clientes', $rutaActual) ? 'active' : ''; ?>"><a href="/clientes">Clientes</a></li>
+                    <li class="<?php echo estaActivo('/empresas', $rutaActual) ? 'active' : ''; ?>"><a href="/empresas">Empresas</a></li>
+                    <li class="<?php echo estaActivo('/proyectos', $rutaActual) ? 'active' : ''; ?>"><a href="/proyectos">Proyectos</a></li>
+                    <li class="<?php echo estaActivo('/permisos', $rutaActual) ? 'active' : ''; ?>"><a href="/permisos">Permisos</a></li>
+                    <li class="<?php echo estaActivo('/categorias', $rutaActual) ? 'active' : ''; ?>"><a href="/categorias">Categorías</a></li>
+                    <li class="<?php echo estaActivo('/bitacora', $rutaActual) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                    <li class="<?php echo estaActivo('/minutas', $rutaActual) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
                 <?php endif; ?>
                 <?php if(rolActual() === 'cliente'): ?>
-                    <li class="<?php echo isActive('/mis-proyectos', $currentPath) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
-                    <li class="<?php echo isActive('/reportes/crear', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
-                    <li class="<?php echo isActive('/reportes', $currentPath) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>                    <li class="<?php echo isActive('/reportes/galeria', $currentPath) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>                    <li class="<?php echo isActive('/bitacora', $currentPath) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
-                    <li class="<?php echo isActive('/minutas', $currentPath) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
-                    <li class="<?php echo isActive('/p-obra', $currentPath) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
+                    <li class="<?php echo estaActivo('/mis-proyectos', $rutaActual) ? 'active' : ''; ?>"><a href="/mis-proyectos">Mis proyectos</a></li>
+                    <li class="<?php echo estaActivo('/reportes/crear', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes/crear">Registro</a></li>
+                    <li class="<?php echo estaActivo('/reportes', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes">Ver reportes</a></li>                    <li class="<?php echo estaActivo('/reportes/galeria', $rutaActual) ? 'active' : ''; ?>"><a href="/reportes/galeria">Galería</a></li>                    <li class="<?php echo estaActivo('/bitacora', $rutaActual) ? 'active' : ''; ?>"><a href="/bitacora">Bitacora</a></li>
+                    <li class="<?php echo estaActivo('/minutas', $rutaActual) ? 'active' : ''; ?>"><a href="/minutas">Minutas</a></li>
+                    <li class="<?php echo estaActivo('/p-obra', $rutaActual) ? 'active' : ''; ?>"><a href="/p-obra">P. Obra</a></li>
                 <?php endif; ?>
             <?php endif; ?>
         </ul>
@@ -99,17 +100,17 @@
         <?php
         // mostrar mensaje si existe (puede incluir tipo)
         if(function_exists('obtenerMensajeFlash')) {
-            $flash = obtenerMensajeFlash();
-            if($flash) {
-                if(is_array($flash)) {
-                    $texto = $flash['texto'];
-                    $tipo = $flash['tipo'] ?? 'success';
+            $mensajeFlash = obtenerMensajeFlash();
+            if($mensajeFlash) {
+                if(is_array($mensajeFlash)) {
+                    $textoMensaje = $mensajeFlash['texto'];
+                    $tipoMensaje = $mensajeFlash['tipo'] ?? 'success';
                 } else {
-                    $texto = $flash;
-                    $tipo = 'success';
+                    $textoMensaje = $mensajeFlash;
+                    $tipoMensaje = 'success';
                 }
-                $color = $tipo === 'error' ? 'red lighten-4' : 'green lighten-4';
-                echo "<div class=\"card-panel $color\"><span class=\"black-text\">" . htmlspecialchars($texto) . "</span></div>";
+                $colorFondo = $tipoMensaje === 'error' ? 'red lighten-4' : 'green lighten-4';
+                echo "<div class=\"card-panel $colorFondo\"><span class=\"black-text\">" . htmlspecialchars($textoMensaje) . "</span></div>";
             }
         }
         ?>

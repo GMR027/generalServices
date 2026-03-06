@@ -8,6 +8,7 @@ class Reporte extends ActiveRecord {
     protected static $columnasDB = [
         'id',
         'proyecto_id',
+        'subdisciplina_id',
         'actividad',
         'area_zonal',
         'nivel',
@@ -26,15 +27,16 @@ class Reporte extends ActiveRecord {
     public $horastrabajadas;
     public $imagenes; // json string
     public $created_at;
+    public $subdisciplina_id;
     public $permiso_tipo; // permiso del usuario sobre el proyecto (no es columna DB)
     // alias fields from joins
     public $proyecto_nombre;
-    public $disciplina_nombre;
-    public $subdisciplina_nombre;
+    public $subdisciplina_nombre; // ahora proviene de la propia tabla de reportes
 
     public function __construct($args = []) {
         $this->id = $args['id'] ?? null;
         $this->proyecto_id = $args['proyecto_id'] ?? '';
+        $this->subdisciplina_id = $args['subdisciplina_id'] ?? '';
         $this->actividad = $args['actividad'] ?? '';
         $this->area_zonal = $args['area_zonal'] ?? '';
         $this->nivel = $args['nivel'] ?? '';
@@ -52,13 +54,16 @@ class Reporte extends ActiveRecord {
         $this->permiso_tipo = $args['permiso_tipo'] ?? null;
         // aliases from joins (proyecto/disciplina/subdisciplina)
         $this->proyecto_nombre = $args['proyecto_nombre'] ?? null;
-        $this->disciplina_nombre = $args['disciplina_nombre'] ?? null;
+        // disciplina_nombre has been removed – mantener compatibilidad si aparece accidentalmente
         $this->subdisciplina_nombre = $args['subdisciplina_nombre'] ?? null;
     }
 
     public function validarErrores() {
         if(!$this->proyecto_id) {
             self::$errores[] = 'Seleccione un proyecto';
+        }
+        if(!$this->subdisciplina_id) {
+            self::$errores[] = 'Seleccione una subdisciplina';
         }
         if(!$this->actividad) {
             self::$errores[] = 'Ingrese actividad';

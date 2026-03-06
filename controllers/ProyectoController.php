@@ -4,24 +4,13 @@ namespace Controllers;
 
 use MVC\Router;
 use Model\Proyecto;
-use Model\Disciplina;
-use Model\Subdisciplina;
 use Model\Permiso;
 
 class ProyectoController {
     public static function index(Router $router) {
         $proyectos = Proyecto::all();
-        // maps for display
-        $disciplinas = Disciplina::all();
-        $discipMap = [];
-        foreach($disciplinas as $d){ $discipMap[$d->id] = $d->nombre; }
-        $subdisciplinas = Subdisciplina::all();
-        $subMap = [];
-        foreach($subdisciplinas as $s){ $subMap[$s->id] = $s->nombre; }
         $router->render('proyectos/index', [
-            'proyectos' => $proyectos,
-            'discipMap' => $discipMap,
-            'subMap' => $subMap
+            'proyectos' => $proyectos
         ]);
     }
 
@@ -31,8 +20,6 @@ class ProyectoController {
             return;
         }
         $proyecto = new Proyecto;
-        $disciplinas = Disciplina::all();
-        $subdisciplinas = Subdisciplina::all();
         $errores = Proyecto::getErrores();
 
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,8 +33,6 @@ class ProyectoController {
 
         $router->render('proyectos/crear', [
             'proyecto' => $proyecto,
-            'disciplinas' => $disciplinas,
-            'subdisciplinas' => $subdisciplinas,
             'errores' => $errores
         ]);
     }
@@ -59,8 +44,6 @@ class ProyectoController {
         }
         $id = validarId('/proyectos');
         $proyecto = Proyecto::find($id);
-        $disciplinas = Disciplina::all();
-        $subdisciplinas = Subdisciplina::all();
         $errores = Proyecto::getErrores();
 
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -74,8 +57,6 @@ class ProyectoController {
 
         $router->render('proyectos/actualizar', [
             'proyecto' => $proyecto,
-            'disciplinas' => $disciplinas,
-            'subdisciplinas' => $subdisciplinas,
             'errores' => $errores
         ]);
     }

@@ -4,7 +4,7 @@ namespace Model;
 
 class Proyecto extends ActiveRecord {
     protected static $tabla = 'proyectos';
-    protected static $columnasDB = ['id','nombre','ubicacion','disciplina_id','subdisciplina_id','fecha_inicio','fecha_fin'];
+    protected static $columnasDB = ['id','nombre','ubicacion','fecha_inicio','fecha_fin'];
 
     public $id;
     public $nombre;
@@ -18,8 +18,7 @@ class Proyecto extends ActiveRecord {
         $this->id = $args['id'] ?? null;
         $this->nombre = $args['nombre'] ?? '';
         $this->ubicacion = $args['ubicacion'] ?? '';
-        $this->disciplina_id = $args['disciplina_id'] ?? '';
-        $this->subdisciplina_id = $args['subdisciplina_id'] ?? '';
+        // antiguamente se almacenaban disciplina y subdisciplina
         $this->fecha_inicio = $args['fecha_inicio'] ?? '';
         $this->fecha_fin = $args['fecha_fin'] ?? '';
     }
@@ -30,12 +29,6 @@ class Proyecto extends ActiveRecord {
         }
         if(!$this->ubicacion) {
             self::$errores[] = 'La ubicación es obligatoria';
-        }
-        if(!$this->disciplina_id) {
-            self::$errores[] = 'Seleccione disciplina';
-        }
-        if(!$this->subdisciplina_id) {
-            self::$errores[] = 'Seleccione subdisciplina';
         }
         if(!$this->fecha_inicio) {
             self::$errores[] = 'Fecha de inicio obligatoria';

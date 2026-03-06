@@ -20,6 +20,16 @@
     </div>
 
     <div class="campo">
+        <label for="subdisciplina">Subdisciplina</label>
+        <select name="subdisciplina_id" required>
+            <option value="">-- Seleccione --</option>
+            <?php foreach($subdisciplinas as $sd): ?>
+                <option value="<?php echo $sd->id; ?>" <?php echo $reporte->subdisciplina_id == $sd->id ? 'selected' : ''; ?>><?php echo $sd->nombre; ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+
+    <div class="campo">
         <label for="actividad">Actividad</label>
         <input type="text" id="actividad" name="actividad" required value="<?php echo $reporte->actividad; ?>">
     </div>
@@ -51,3 +61,10 @@
 
     <button type="submit" class="btn green"><i class="material-icons left">save</i>Guardar Cambios</button>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    M.FormSelect.init(elems);
+});
+</script>

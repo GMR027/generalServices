@@ -5,7 +5,7 @@
 
 <table class="striped highlight responsive-table">
     <thead>
-        <tr><th>ID</th><th>Nombre</th><th>Ubicación</th><th>Disciplina</th><th>Subdisciplina</th><th>Inicio</th><th>Fin</th><th>Acciones</th></tr>
+        <tr><th>ID</th><th>Nombre</th><th>Ubicación</th><th>Inicio</th><th>Fin</th><th>Acciones</th></tr>
     </thead>
     <tbody>
         <?php foreach($proyectos as $p): ?>
@@ -13,8 +13,6 @@
                 <td><?php echo $p->id; ?></td>
                 <td><?php echo $p->nombre; ?></td>
                 <td><?php echo $p->ubicacion; ?></td>
-                <td><?php echo $discipMap[$p->disciplina_id] ?? $p->disciplina_id; ?></td>
-                <td><?php echo $subMap[$p->subdisciplina_id] ?? $p->subdisciplina_id; ?></td>
                 <td><?php echo $p->fecha_inicio; ?></td>
                 <td><?php echo $p->fecha_fin; ?></td>
                 <td>
