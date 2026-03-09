@@ -16,9 +16,12 @@ function validarId(string $url) {
     $id = filter_var($id, FILTER_VALIDATE_INT);
     if(!$id) {
         header("Location: $url");
+        exit;
     }
     return $id;
 }
+
+define('AUTH_COOKIE', 'auth');
 
 function asegurarSesion() {
     if(session_status() !== PHP_SESSION_ACTIVE) {
@@ -26,14 +29,22 @@ function asegurarSesion() {
     }
 }
 
+function leerCookieAuth(): ?array {
+    $raw = $_COOKIE[AUTH_COOKIE] ?? null;
+    if(!$raw) return null;
+    $data = json_decode(base64_decode($raw), true);
+    if(!is_array($data) || empty($data['login'])) return null;
+    return $data;
+}
+
 function esAdmin(): bool {
-    asegurarSesion();
-    return isset($_SESSION['rol']) && $_SESSION['rol'] === 'admin';
+    $auth = leerCookieAuth();
+    return $auth !== null && ($auth['rol'] ?? '') === 'admin';
 }
 
 function esCliente(): bool {
-    asegurarSesion();
-    return isset($_SESSION['rol']) && $_SESSION['rol'] === 'cliente';
+    $auth = leerCookieAuth();
+    return $auth !== null && ($auth['rol'] ?? '') === 'cliente';
 }
 
 // flash message helpers
@@ -59,17 +70,16 @@ function obtenerMensajeFlash() {
 }
 
 function usuarioActual(): ?string {
-    asegurarSesion();
-    // email stored during autenticación
-    return $_SESSION['correo'] ?? null;
+    $auth = leerCookieAuth();
+    return $auth['correo'] ?? null;
 }
 
 function idActual(): ?int {
-    asegurarSesion();
-    return isset($_SESSION['id']) ? intval($_SESSION['id']) : null;
+    $auth = leerCookieAuth();
+    return isset($auth['id']) ? intval($auth['id']) : null;
 }
 
 function rolActual(): ?string {
-    asegurarSesion();
-    return $_SESSION['rol'] ?? null;
+    $auth = leerCookieAuth();
+    return $auth['rol'] ?? null;
 }

@@ -1,0 +1,36 @@
+replicaCount: 3
+volumeMountPath: 'shared-volume'
+
+config:
+  ENV: production
+  DB_HOST: mysql.general-services.svc.cluster.local
+  DB_NAME: gestionproyectos
+  DB_USER: root
+  DB_PASSWORD: general-services
+
+image:
+  registry: christopherguzman
+  repository: general-services
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 80
+
+ingress:
+  enabled: true
+  host: gs.iguzman.com.mx
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+deployment:
+  nodeSelector:
+    nodeProjects: 'real-clients'
