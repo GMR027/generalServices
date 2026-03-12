@@ -78,18 +78,28 @@ class Usuario extends ActiveRecord {
     }
 
     public function autenticar() {
-        // ensure session started without duplicate warnings
+        // session is still needed for flash messages
         if(function_exists('asegurarSesion')) {
             asegurarSesion();
         } else {
             if(session_status() !== PHP_SESSION_ACTIVE) session_start();
         }
 
-        $_SESSION['id'] = $this->id;
-        $_SESSION['nombre'] = $this->nombre;
-        $_SESSION['correo'] = $this->correo;
-        $_SESSION['rol'] = $this->rol;
-        $_SESSION['login'] = true;
+        $datos = [
+            'id'     => $this->id,
+            'nombre' => $this->nombre,
+            'correo' => $this->correo,
+            'rol'    => $this->rol,
+            'login'  => true,
+        ];
+        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        setcookie(AUTH_COOKIE, base64_encode(json_encode($datos)), [
+            'expires'  => time() + 28800, // 8 hours
+            'path'     => '/',
+            'httponly' => true,
+            'secure'   => $secure,
+            'samesite' => 'Strict',
+        ]);
 
         // mensaje de bienvenida
         if(function_exists('establecerMensajeFlash')) {

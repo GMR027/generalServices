@@ -43,8 +43,21 @@ class AuthController {
     }
 
     public static function logout() {
-        session_start();
+        // delete auth cookie
+        $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        setcookie(AUTH_COOKIE, '', [
+            'expires'  => time() - 3600,
+            'path'     => '/',
+            'httponly' => true,
+            'secure'   => $secure,
+            'samesite' => 'Strict',
+        ]);
+        unset($_COOKIE[AUTH_COOKIE]);
+
+        asegurarSesion();
         $_SESSION = [];
+        session_destroy();
         header('Location: /');
+        exit;
     }
 }

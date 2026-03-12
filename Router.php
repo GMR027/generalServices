@@ -16,8 +16,20 @@ class Router {
   }
 
   public function comprobarRutas() {
-    session_start();
-    $ingreso = $_SESSION['login'] ?? null;
+    // session is kept only for flash messages; auth comes from the cookie
+    if(session_status() !== PHP_SESSION_ACTIVE) {
+      session_start();
+    }
+
+    $raw = $_COOKIE[AUTH_COOKIE] ?? null;
+    $authData = null;
+    if($raw) {
+      $decoded = json_decode(base64_decode($raw), true);
+      if(is_array($decoded) && !empty($decoded['login'])) {
+        $authData = $decoded;
+      }
+    }
+    $ingreso = $authData !== null;
 
     // rutas que requieren login (y en su mayoría son de administración)
     $rutasProtegidas = [
@@ -46,11 +58,13 @@ class Router {
 
     if(in_array($urlActual, $rutasProtegidas)) {
       if(!$ingreso) {
-        header('location: /login');
+        header('location: /');
+        exit;
       } else {
         // solo administradores pueden acceder a estas rutas
         if(function_exists('esAdmin') && !esAdmin()) {
           header('location: /');
+          exit;
         }
       }
     }
