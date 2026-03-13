@@ -30,6 +30,11 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
+        {{- if .Values.volume }}
+        volumeMounts:
+        - name: {{ .Values.volume.name }}
+          mountPath: {{ .Values.volume.mountPath }}
+        {{- end }}
         # lifecycle:
         #   postStart:
         #     exec:
@@ -42,5 +47,12 @@ spec:
         #           echo php_value post_max_size 256M >> /var/www/html/.htaccess;
         #           echo php_value max_execution_time 300 >> /var/www/html/.htaccess;
         #           echo php_value max_input_time 300 >> /var/www/html/.htaccess;
+      {{- if .Values.volume }}
+      volumes:
+      - name: {{ .Values.volume.name }}
+        hostPath:
+          path: /{{ .Values.volume.hostPath }}/{{ .Release.Namespace }}/media
+          type: DirectoryOrCreate
+      {{- end }}
       nodeSelector:
           {{- toYaml .Values.deployment.nodeSelector | nindent 12 }}

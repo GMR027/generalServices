@@ -1,5 +1,9 @@
 replicaCount: 3
-volumeMountPath: 'shared-volume'
+
+volume:
+  name: 'shared-volume'
+  hostPath: /shared-master
+  mountPath: /var/www/public/image
 
 config:
   ENV: production
