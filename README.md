@@ -106,6 +106,39 @@ kubectl -n general-services get ingress
 
 La aplicación quedará disponible en: `https://gs.iguzman.com.mx`
 
+### Crear el archivo `.healthy` (requerido tras el despliegue)
+
+Los pods usan un `startupProbe` y un `livenessProbe` que verifican la existencia del archivo `.healthy` dentro del volumen hostPath montado. Sin este archivo, los pods no pasarán a estado `Running`.
+
+Tras el primer despliegue (o si el directorio aún no existe), crea el archivo usando una de las siguientes opciones:
+
+**Opción A — directamente en el nodo:**
+
+```bash
+mkdir -p /shared-master/general-services/media
+touch /shared-master/general-services/media/.healthy
+```
+
+**Opción B — vía kubectl (sin acceso directo al nodo):**
+
+```bash
+kubectl -n general-services run create-healthy \
+  --image=busybox \
+  --restart=Never \
+  --rm \
+  --overrides='{
+    "spec": {
+      "nodeSelector": {"nodeProjects": "real-clients"},
+      "volumes": [{"name": "media", "hostPath": {"path": "/shared-master/general-services/media", "type": "DirectoryOrCreate"}}],
+      "containers": [{"name": "create-healthy", "image": "busybox", "command": ["touch", "/media/.healthy"], "volumeMounts": [{"name": "media", "mountPath": "/media"}]}]
+    }
+  }' -- touch /media/.healthy
+```
+
+Este comando crea un pod temporal en el nodo correcto, monta el mismo hostPath, crea el archivo y se elimina solo.
+
+> El namespace forma parte de la ruta. Si usas un namespace distinto a `general-services`, ajusta la ruta según corresponda.
+
 ---
 
 ## English
@@ -208,3 +241,36 @@ kubectl -n general-services get ingress
 ```
 
 The application will be available at: `https://gs.iguzman.com.mx`
+
+### Create the `.healthy` file (required after deployment)
+
+Pods use a `startupProbe` and a `livenessProbe` that check for the existence of a `.healthy` file inside the mounted hostPath volume. Without this file, pods will not reach `Running` state.
+
+After the first deployment (or if the directory does not yet exist), create the file using one of the following options:
+
+**Option A — directly on the node:**
+
+```bash
+mkdir -p /shared-master/general-services/media
+touch /shared-master/general-services/media/.healthy
+```
+
+**Option B — via kubectl (without direct node access):**
+
+```bash
+kubectl -n general-services run create-healthy \
+  --image=busybox \
+  --restart=Never \
+  --rm \
+  --overrides='{
+    "spec": {
+      "nodeSelector": {"nodeProjects": "real-clients"},
+      "volumes": [{"name": "media", "hostPath": {"path": "/shared-master/general-services/media", "type": "DirectoryOrCreate"}}],
+      "containers": [{"name": "create-healthy", "image": "busybox", "command": ["touch", "/media/.healthy"], "volumeMounts": [{"name": "media", "mountPath": "/media"}]}]
+    }
+  }' -- touch /media/.healthy
+```
+
+This command creates a temporary pod on the correct node, mounts the same hostPath, creates the file, and deletes itself.
+
+> The namespace is part of the path. If you use a namespace other than `general-services`, adjust the path accordingly.
