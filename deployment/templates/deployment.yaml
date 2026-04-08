@@ -12,6 +12,13 @@ spec:
       labels:
         app: {{ .Chart.Name }}
     spec:
+      # initContainers:
+      # - name: fix-volume-permissions
+      #   image: busybox
+      #   command: ["sh", "-c", "chmod -R 777 /data"]
+      #   volumeMounts:
+      #   - name: {{ .Values.volume.name }}
+      #     mountPath: /data
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -30,44 +37,30 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.volume }}
-        volumeMounts:
-        - name: {{ .Values.volume.name }}
-          mountPath: {{ .Values.volume.mountPath }}
         startupProbe:
           exec:
             command:
             - test
-            - -f
-            - {{ .Values.volume.mountPath }}/.healthy
+            - -d
+            - {{ .Values.volume.mountPath }}
           failureThreshold: 30
           periodSeconds: 10
         livenessProbe:
           exec:
             command:
             - test
-            - -f
-            - {{ .Values.volume.mountPath }}/.healthy
-          periodSeconds: 10
+            - -d
+            - {{ .Values.volume.mountPath }}
+        {{- if .Values.volume }}
+        volumeMounts:
+        - name: {{ .Values.volume.name }}
+          mountPath: {{ .Values.volume.mountPath }}
         {{- end }}
-        # lifecycle:
-        #   postStart:
-        #     exec:
-        #       command:
-        #         - "sh"
-        #         - "-c"
-        #         - >
-        #           chown -R www-data:www-data /var/www; chmod -R 777 /var/www;
-        #           echo php_value upload_max_filesize 256M >> /var/www/html/.htaccess;
-        #           echo php_value post_max_size 256M >> /var/www/html/.htaccess;
-        #           echo php_value max_execution_time 300 >> /var/www/html/.htaccess;
-        #           echo php_value max_input_time 300 >> /var/www/html/.htaccess;
       {{- if .Values.volume }}
       volumes:
       - name: {{ .Values.volume.name }}
-        hostPath:
-          path: {{ .Values.volume.hostPath }}/{{ .Release.Namespace }}/media
-          type: DirectoryOrCreate
+        persistentVolumeClaim:
+          claimName: {{ .Values.volume.name }}
       {{- end }}
       nodeSelector:
           {{- toYaml .Values.deployment.nodeSelector | nindent 12 }}
